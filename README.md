@@ -1,13 +1,15 @@
-# microkit
-
+```
                  oo                            dP       oo   dP
                                               88            88
       88d8b.d8b. dP .d8888b. 88d888b. .d8888b. 88  .dP  dP d8888P
       88'`88'`88 88 88'  `"" 88'  `88 88'  `88 88888"   88   88
       88  88  88 88 88.  ... 88       88.  .88 88  `8b. 88   88
       dP  dP  dP dP `88888P' dP       `88888P' dP   `YP dP   dP
+```
 
-is an opinionated software framework for developing embedded systems in C.
+# microkit
+
+**microkit** is an opinionated software framework for developing embedded systems in C.
 
 ## Getting Started
 
