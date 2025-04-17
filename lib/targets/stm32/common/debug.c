@@ -1,8 +1,8 @@
 
 
-#include "microkit/debug.h"
-#include "microkit/config/os.h"
-#include "microkit/console/console.h"
+#include "microkit/lib/debug.h"
+#include "microkit/lib/config/os.h"
+#include "microkit/lib/modules/console/console.h"
 
 #include <stm32h533xx.h>
 #include <stm32h5xx_hal.h>

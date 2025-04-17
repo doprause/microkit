@@ -7,8 +7,8 @@
  * @copyright Copyright (c) 2025
  * - - - - - -- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-#ifndef MKIT_SYSIO_H
-#define MKIT_SYSIO_H
+#ifndef MICROKIT_PLATFORM_SYSIO_H
+#define MICROKIT_PLATFORM_SYSIO_H
 
 /**
  * @brief Gets one character (byte) from the system I/O.

@@ -9,8 +9,8 @@
 #ifndef MICROKIT_ASSERT_H
 #define MICROKIT_ASSERT_H
 
-#include "contracts/mapi/assert.h"
-#include "types.h"
+#include "microkit/lib/contracts/platform/assert.h"
+#include "microkit/lib/types.h"
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
@@ -20,7 +20,7 @@
 #define ASSERT(expression)                                                     \
    do {                                                                        \
       if (!(expression)) {                                                     \
-         mapi_gpio_assertion();                                                \
+         gpio_assertion();                                                     \
       }                                                                        \
    } while (0)
 
@@ -39,7 +39,7 @@
 #define ASSERT_NULL_POINTER(pointer)                                           \
    do {                                                                        \
       if ((pointer) != NULL) {                                                 \
-         mapi_gpio_assertion();                                                \
+         gpio_assertion();                                                     \
       }                                                                        \
    } while (0)
 
@@ -50,7 +50,7 @@
 #define ASSERT_NOT_NULL_POINTER(pointer)                                       \
    do {                                                                        \
       if ((pointer) == NULL) {                                                 \
-         mapi_gpio_assertion();                                                \
+         gpio_assertion();                                                     \
       }                                                                        \
    } while (0)
 

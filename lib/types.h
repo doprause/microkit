@@ -14,11 +14,14 @@
 #include <stddef.h>
 #include <stdint.h>
 
-typedef unsigned int UInt;
-typedef uint8_t Uint8;
-typedef uint16_t Uint16;
-typedef uint32_t Uint32;
+typedef bool Bool;
 
+typedef unsigned int UInt;
+typedef uint8_t UInt8;
+typedef uint16_t UInt16;
+typedef uint32_t UInt32;
+
+typedef int Int;
 typedef int8_t Int8;
 typedef int16_t Int16;
 typedef int32_t Int32;

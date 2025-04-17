@@ -1,8 +1,8 @@
-#ifndef MAPI_ASSERT_H
-#define MAPI_ASSERT_H
+#ifndef MICROKIT_PLATFORM_ASSERT_H
+#define MICROKIT_PLATFORM_ASSERT_H
 
-void mapi_console_assertion(const char *message);
+void console_assertion(const char* message);
 
-void mapi_gpio_assertion(void);
+void gpio_assertion(void);
 
 #endif
