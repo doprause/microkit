@@ -1,18 +1,25 @@
-/** - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+/**
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ *                 oo                            dP       oo   dP
+ *                                              88            88
+ *      88d8b.d8b. dP .d8888b. 88d888b. .d8888b. 88  .dP  dP d8888P
+ *      88'`88'`88 88 88'  `"" 88'  `88 88'  `88 88888"   88   88
+ *      88  88  88 88 88.  ... 88       88.  .88 88  `8b. 88   88
+ *      dP  dP  dP dP `88888P' dP       `88888P' dP   `YP dP   dP
+ *
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  * @file assert.h
- * @author D. Prause
- * @brief I2C HAL API.
+ * @author Dominik Prause (dominik@inspirent.io)
  * @version 0.1
- * @date 2024-11-19
- * @copyright Copyright (c) 2025
- * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+ * @date 2025-04-17
+ * @copyright Copyright (c) 2025 - All rights reserved.
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
 #ifndef MICROKIT_ASSERT_H
 #define MICROKIT_ASSERT_H
 
 #include "contracts/mapi/assert.h"
 #include "types.h"
-
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 /**
  * @brief Asserts that the given expression is true.

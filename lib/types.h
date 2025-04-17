@@ -1,12 +1,20 @@
 /**
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ *                 oo                            dP       oo   dP
+ *                                              88            88
+ *      88d8b.d8b. dP .d8888b. 88d888b. .d8888b. 88  .dP  dP d8888P
+ *      88'`88'`88 88 88'  `"" 88'  `88 88'  `88 88888"   88   88
+ *      88  88  88 88 88.  ... 88       88.  .88 88  `8b. 88   88
+ *      dP  dP  dP dP `88888P' dP       `88888P' dP   `YP dP   dP
+ *
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  * @file types.h
- * @author D. Prause
- * @brief Global type definitions.
+ * @author Dominik Prause (dominik@inspirent.io)
  * @version 0.1
- * @date 2024-11-05
- * @copyright Copyright (c) 2024
+ * @date 2025-04-17
+ * @copyright Copyright (c) 2025 - All rights reserved.
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
-
 #ifndef MICROKIT_TYPES_H
 #define MICROKIT_TYPES_H
 
