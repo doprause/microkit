@@ -1,7 +1,7 @@
 #ifndef MKIT_UART_H
 #define MKIT_UART_H
 
-#include "types.h"
+#include "microkit/lib/types.h"
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
@@ -82,7 +82,7 @@ void uart_stop(const UartDevice device);
  * @param length The length of the data to be sent.
  * @return The number of bytes sent.
  */
-int uart_send(const UartDevice device, uint8* data, size length);
+Int uart_send(const UartDevice device, UInt8* data, Size length);
 
 /**
  * @brief Receives up to maxLength bytes from the UART device.
@@ -91,7 +91,7 @@ int uart_send(const UartDevice device, uint8* data, size length);
  * @param maxLength The maximum number of bytes to receive.
  * @return The number of bytes actually received.
  */
-int uart_receive(const UartDevice device, uint8* data, size maxLength);
+Int uart_receive(const UartDevice device, UInt8* data, Size maxLength);
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 #endif

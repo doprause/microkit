@@ -3,7 +3,7 @@
 #ifndef CONFIG_MCU_H
 #define CONFIG_MCU_H
 
-#include "types.h"
+#include "microkit/lib/types.h"
 
 #define CONFIG_MCU_USE_I2C1 TRUE
 #define CONFIG_MCU_USE_I2C2 FALSE

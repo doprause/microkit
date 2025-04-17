@@ -1,0 +1,7 @@
+
+#ifndef MICROKIT_CONFIG_I2C_H
+#define MICROKIT_CONFIG_I2C_H
+
+#define CONFIG_I2C_USE_SLAVE_MODE TRUE
+
+#endif

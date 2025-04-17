@@ -1,9 +1,9 @@
 
-#include "microkit/config/i2c.h"
-#include "microkit/assert.h"
-#include "microkit/config/mcu.h"
-#include "microkit/debug.h"
-#include "microkit/val/i2c.h"
+#include "microkit/lib/assert.h"
+#include "microkit/lib/config/i2c.h"
+#include "microkit/lib/config/mcu.h"
+#include "microkit/lib/debug.h"
+#include "microkit/lib/contracts/platform/drivers/i2c.h"
 
 #include "stm32h5xx_hal.h"
 
@@ -37,8 +37,8 @@ typedef struct {
 } I2cCallbacks;
 
 typedef struct {
-   uint8 rxByte;
-   uint8 txByte;
+   UInt8 rxByte;
+   UInt8 txByte;
 } I2cSlaveState;
 
 /**
@@ -193,8 +193,8 @@ void i2c_stop(const I2cDevice device) {
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    👉 I2C master mode functions
    - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-StatusOrNumber i2c_receive(const I2cDevice device, uint8 deviceAddress,
-                           uint8* data, size dataSize, bool async) {
+StatusOrNumber i2c_receive(const I2cDevice device, UInt8 deviceAddress,
+                           UInt8* data, Size dataSize, Bool async) {
 
    ASSERT_NOT_NULL_POINTER(device);
 
@@ -221,8 +221,8 @@ StatusOrNumber i2c_receive(const I2cDevice device, uint8 deviceAddress,
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-StatusOrNumber i2c_transmit(const I2cDevice device, uint8 deviceAddress,
-                            uint8* data, size dataSize, bool async) {
+StatusOrNumber i2c_transmit(const I2cDevice device, const UInt8 deviceAddress,
+                            UInt8* data, Size dataSize, Bool async) {
 
    ASSERT_NOT_NULL_POINTER(device);
 
@@ -251,9 +251,9 @@ StatusOrNumber i2c_transmit(const I2cDevice device, uint8 deviceAddress,
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    👉 I2C master mode memory read/write functions
    - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-StatusOrNumber i2c_memory_read(const I2cDevice device, uint8 deviceAddress,
-                               uint16 memoryAddress, uint16 memoryAddressSize,
-                               uint8* data, size dataSize, bool async) {
+StatusOrNumber i2c_memory_read(const I2cDevice device, const UInt8 deviceAddress,
+                               const UInt16 memoryAddress, const UInt16 memoryAddressSize,
+                               UInt8* data, const Size dataSize, const Bool async) {
 
    ASSERT_NOT_NULL_POINTER(device);
 
@@ -267,9 +267,7 @@ StatusOrNumber i2c_memory_read(const I2cDevice device, uint8 deviceAddress,
 
    device->status.memoryReadComplete = false;
 
-   HAL_StatusTypeDef status =
-       HAL_I2C_Mem_Read_IT(&device->mcu, (uint16)deviceAddress << 1,
-                           memoryAddress, memoryAddressSize, data, dataSize);
+   HAL_StatusTypeDef status = HAL_I2C_Mem_Read_IT(&device->mcu, (UInt16)deviceAddress << 1, memoryAddress, memoryAddressSize, data, dataSize);
 
    // If we are not in async mode, we need to wait for the transfer to complete
    if (!async) {
@@ -281,9 +279,9 @@ StatusOrNumber i2c_memory_read(const I2cDevice device, uint8 deviceAddress,
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-StatusOrNumber i2c_memory_write(const I2cDevice device, uint8 deviceAddress,
-                                uint16 memoryAddress, uint16 memoryAddressSize,
-                                uint8* data, size dataSize, bool async) {
+StatusOrNumber i2c_memory_write(const I2cDevice device, const UInt8 deviceAddress,
+                                const UInt16 memoryAddress, const UInt16 memoryAddressSize,
+                                const UInt8* data, const Size dataSize, const Bool async) {
 
    ASSERT_NOT_NULL_POINTER(device);
 
@@ -294,8 +292,7 @@ StatusOrNumber i2c_memory_write(const I2cDevice device, uint8 deviceAddress,
    device->status.memoryWriteComplete = false;
 
    HAL_StatusTypeDef status =
-       HAL_I2C_Mem_Write_IT(&device->mcu, (uint16)deviceAddress << 1,
-                            memoryAddress, memoryAddressSize, data, dataSize);
+       HAL_I2C_Mem_Write_IT(&device->mcu, (UInt16)deviceAddress << 1, memoryAddress, memoryAddressSize, (UInt8*)data, dataSize);
 
    // If we are not in async mode, we need to wait for the transfer to complete
    if (!async) {
@@ -528,7 +525,7 @@ void HAL_I2C_ErrorCallback(I2C_HandleTypeDef* handle) {
 
    // TODO: Implement error statistics
 
-   uint32 errorcode = HAL_I2C_GetError(handle);
+   UInt32 errorcode = HAL_I2C_GetError(handle);
 
    if (errorcode == HAL_I2C_ERROR_BERR) {
       // BERR error

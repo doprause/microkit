@@ -1,9 +1,9 @@
 
-#include "contracts/platform/drivers/uart.h"
-#include "assert.h"
-#include "config/mcu.h"
-#include "config/os.h"
-#include "contracts/platform/sysio.h"
+#include "microkit/lib/contracts/platform/drivers/uart.h"
+#include "microkit/lib/assert.h"
+#include "microkit/lib/config/mcu.h"
+#include "microkit/lib/config/os.h"
+#include "microkit/lib/contracts/platform/sysio.h"
 
 #include "stm32h5xx_hal.h"
 
@@ -58,10 +58,10 @@ const UartDevice DEVICE_CONSOLE = &DEVICE_UART2;
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    👉 Forward declarations
    - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-static uint uart_convert_baudrate_for_mcu(UartBaudRate baudrate);
-static uint uart_convert_databits_for_mcu(UartDataBits databits);
-static uint uart_convert_stopbits_for_mcu(UartStopBits stopbits);
-static uint uart_convert_parity_for_mcu(UartParity parity);
+static UInt uart_convert_baudrate_for_mcu(UartBaudRate baudrate);
+static UInt uart_convert_databits_for_mcu(UartDataBits databits);
+static UInt uart_convert_stopbits_for_mcu(UartStopBits stopbits);
+static UInt uart_convert_parity_for_mcu(UartParity parity);
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    👉 UART interface implementation
@@ -141,28 +141,27 @@ void uart_stop(const UartDevice device) {
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-int uart_receive(const UartDevice device, unsigned char* data, size maxLength) {
+int uart_receive(const UartDevice device, UInt8* data, const Size size) {
 
    ASSERT_NOT_NULL_POINTER(device);
    ASSERT(device->state == MKIT_UART_STATE_STARTED);
 
-   return HAL_UART_Receive(&device->mcu, data, maxLength, 100) == HAL_OK ? 0
-                                                                         : -1;
+   return HAL_UART_Receive(&device->mcu, data, size, 100) == HAL_OK ? 0 : -1;
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-int uart_send(const UartDevice device, unsigned char* data, size length) {
+int uart_send(const UartDevice device, UInt8* data, const Size size) {
 
    ASSERT_NOT_NULL_POINTER(device);
    ASSERT(device->state == MKIT_UART_STATE_STARTED);
 
-   return HAL_UART_Transmit(&device->mcu, data, length, 0) == HAL_OK ? 0 : -1;
+   return HAL_UART_Transmit(&device->mcu, data, size, 0) == HAL_OK ? 0 : -1;
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    👉 SYSIO interface implementation
    - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-int MKIT_sysio_get(void) {
+int sysio_get(void) {
 
    ASSERT(DEVICE_CONSOLE->state == MKIT_UART_STATE_STARTED);
 
@@ -175,7 +174,7 @@ int MKIT_sysio_get(void) {
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-void MKIT_sysio_put(int c) {
+void sysio_put(int c) {
 
    ASSERT(DEVICE_CONSOLE->state == MKIT_UART_STATE_STARTED);
 
@@ -185,7 +184,7 @@ void MKIT_sysio_put(int c) {
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    👉 Private functions
    - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-static uint uart_convert_baudrate_for_mcu(UartBaudRate baudrate) {
+static UInt uart_convert_baudrate_for_mcu(UartBaudRate baudrate) {
 
    switch (baudrate) {
    case MKIT_UART_BAUDRATE_9600:
@@ -208,7 +207,7 @@ static uint uart_convert_baudrate_for_mcu(UartBaudRate baudrate) {
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-static uint uart_convert_databits_for_mcu(UartDataBits databits) {
+static UInt uart_convert_databits_for_mcu(UartDataBits databits) {
 
    switch (databits) {
    case MKIT_UART_DATABITS_8:
@@ -219,7 +218,7 @@ static uint uart_convert_databits_for_mcu(UartDataBits databits) {
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-static uint uart_convert_stopbits_for_mcu(UartStopBits stopbits) {
+static UInt uart_convert_stopbits_for_mcu(UartStopBits stopbits) {
 
    switch (stopbits) {
    case MKIT_UART_STOPBITS_1:
@@ -232,7 +231,7 @@ static uint uart_convert_stopbits_for_mcu(UartStopBits stopbits) {
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-static uint uart_convert_parity_for_mcu(UartParity parity) {
+static UInt uart_convert_parity_for_mcu(UartParity parity) {
 
    switch (parity) {
    case MKIT_UART_PARITY_NONE:

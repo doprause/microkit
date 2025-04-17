@@ -1,15 +1,7 @@
-/** - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- * @file i2c.h
- * @author D. Prause
- * @brief I2C HAL API.
- * @version 0.1
- * @date 2025-01-16
- * @copyright Copyright (c) 2025
- * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-#ifndef MAPI_I2C_H
-#define MAPI_I2C_H
+#ifndef MICROKIT_I2C_H
+#define MICROKIT_I2C_H
 
-#include "types.h"
+#include "microkit/lib/types.h"
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    👉 I2C type definitions
@@ -19,20 +11,20 @@
  * @brief I2C error codes.
  */
 typedef enum {
-   MAPI_I2C_ERROR,
-   MAPI_I2C_ERROR_BUS_ERROR,
-   MAPI_I2C_ERROR_ACKNOWLEDGE_ERROR,
+   MKIT_I2C_ERROR,
+   MKIT_I2C_ERROR_BUS_ERROR,
+   MKIT_I2C_ERROR_ACKNOWLEDGE_ERROR,
 } I2cError;
 
 /**
  * @brief I2C mode settings.
  */
-typedef enum { MAPI_I2C_MODE_MASTER, MAPI_I2C_MODE_SLAVE } I2cMode;
+typedef enum { MKIT_I2C_MODE_MASTER, MKIT_I2C_MODE_SLAVE } I2cMode;
 
 /**
  * @brief I2C transmission direction.
  */
-typedef enum { MAPI_I2C_DIRECTION_READ, MAPI_I2C_DIRECTION_WRITE } I2cDirection;
+typedef enum { MKIT_I2C_DIRECTION_READ, MKIT_I2C_DIRECTION_WRITE } I2cDirection;
 
 /**
  * I2C device pointer.
@@ -64,7 +56,7 @@ typedef void (*I2cMasterTransmitCompleteHandler)(const I2cDevice device);
  */
 typedef void (*I2cSlaveTransmissionStartedHandler)(const I2cDevice device,
                                                    I2cDirection direction,
-                                                   bool isRepeatedStart);
+                                                   Bool isRepeatedStart);
 
 /**
  * @brief Handler function to provide send a data byte to the I2C master.
@@ -81,20 +73,20 @@ typedef void (*I2cSlaveTransmissionErrorHandler)(const I2cDevice device,
  * @brief Handler function to process a data byte received from the I2C master.
  */
 typedef void (*I2cSlaveByteReceivedHandler)(const I2cDevice device,
-                                            uint8* byte);
+                                            UInt8* byte);
 
 /**
  * @brief Handler function to provide send a data byte to the I2C master.
  */
 typedef void (*I2cSlaveByteRequestedHandler)(const I2cDevice device,
-                                             uint8* byte);
+                                             UInt8* byte);
 
 /**
  * @brief I2C configuration.
  */
 typedef struct {
    const I2cMode mode;
-   const uint32 address;
+   const UInt32 address;
    I2cMasterMemoryReadCompleteHandler memoryReadCompleteHandler;
    I2cMasterMemoryWriteCompleteHandler memoryWriteCompleteHandler;
    I2cMasterReceiveCompleteHandler masterReceiveCompleteHandler;
@@ -143,8 +135,8 @@ void i2c_stop(const I2cDevice device);
  * @param async Whether to perform the operation asynchronously.
  * @returns A status code (STATUS_OK on success, STATUS_ERROR on error).
  */
-StatusOrNumber i2c_receive(const I2cDevice device, uint8 deviceAddress,
-                           uint8* data, size dataSize, bool async);
+StatusOrNumber i2c_receive(const I2cDevice device, UInt8 deviceAddress,
+                           UInt8* data, Size dataSize, Bool async);
 
 /**
  * @brief Writes #dataSize bytes to the slave device.
@@ -155,8 +147,8 @@ StatusOrNumber i2c_receive(const I2cDevice device, uint8 deviceAddress,
  * @param async Whether to perform the operation asynchronously.
  * @returns A status code (STATUS_OK on success, STATUS_ERROR on error).
  */
-StatusOrNumber i2c_transmit(const I2cDevice device, uint8 deviceAddress,
-                            uint8* data, size dataSize, bool async);
+StatusOrNumber i2c_transmit(const I2cDevice device, UInt8 deviceAddress,
+                            UInt8* data, Size dataSize, Bool async);
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    👉 I2C master mode memory read/write functions
@@ -172,9 +164,9 @@ StatusOrNumber i2c_transmit(const I2cDevice device, uint8 deviceAddress,
  * @returns A status code (STATUS_OK on success, STATUS_ERROR on error)
  * or the number of bytes actually read.
  */
-StatusOrNumber i2c_memory_read(const I2cDevice device, uint8 deviceAddress,
-                               uint16 memoryAddress, uint16 memoryAddressSize,
-                               uint8* data, size dataSize, bool async);
+StatusOrNumber i2c_memory_read(const I2cDevice device, const UInt8 deviceAddress,
+                               const UInt16 memoryAddress, const UInt16 memoryAddressSize,
+                               UInt8* data, const Size dataSize, const Bool async);
 
 /**
  * @brief Writes up to #dataSize bytes to the slave device.
@@ -186,9 +178,9 @@ StatusOrNumber i2c_memory_read(const I2cDevice device, uint8 deviceAddress,
  * @returns A status code (STATUS_OK on success, STATUS_ERROR on error)
  * or the number of bytes actually written.
  */
-StatusOrNumber i2c_memory_write(const I2cDevice device, uint8 deviceAddress,
-                                uint16 memoryAddress, uint16 memoryAddressSize,
-                                uint8* data, size dataSize, bool async);
+StatusOrNumber i2c_memory_write(const I2cDevice device, const UInt8 deviceAddress,
+                                const UInt16 memoryAddress, const UInt16 memoryAddressSize,
+                                const UInt8* data, const Size dataSize, const Bool async);
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 #endif
