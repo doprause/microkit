@@ -44,6 +44,16 @@
 #define TERMCOLOR_BG_CYAN "\033[46m"
 #define TERMCOLOR_BG_WHITE "\033[47m"
 
+/**
+ * @brief colorizes the given text with the given ANSI color
+ */
 #define colorize(text, color) color text TERMCOLOR_RESET
+
+/**
+ * @brief colorizes the given text with the given ANSI
+ * foreground and background color
+ */
+#define colorize2(text, foreground, background)                                \
+   foreground background text TERMCOLOR_RESET
 
 #endif
