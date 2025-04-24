@@ -114,7 +114,7 @@ static void setLevel(const LogLevel level) {
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-MicroKitLoggerInterface Logger = {
+LoggerInterface Logger = {
     .init = init,
     .log = write,
     .getLevel = getLevel,

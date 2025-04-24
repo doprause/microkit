@@ -38,6 +38,9 @@ typedef int64_t Int64;
 
 typedef size_t Size;
 
+typedef const char* String;
+typedef char* StringBuffer;
+
 typedef int Status;
 typedef int StatusOrChar;
 typedef int StatusOrNumber;
@@ -63,7 +66,7 @@ typedef enum {
 // Unused variables
 #ifdef UNUSED_ARG
 #undef UNUSED_ARG
-#warning                                                                       \
+#warning \
     "Undefined UNUSED_ARG and redefined it as #define UNUSED_ARG(x) (void)(x) in the global scope."
 #else
 #define UNUSED_ARG(x) (void)(x)
