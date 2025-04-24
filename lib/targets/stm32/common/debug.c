@@ -37,6 +37,6 @@ void debug_print(const char* fmt, ...) {
    vsnprintf(buffer, CONFIG_OS_DEBUG_PRINT_BUFFER_SIZE, fmt, args);
    va_end(args);
 
-   console_write(buffer);
+   Console.write(buffer);
 }
 #endif

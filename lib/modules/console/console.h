@@ -18,30 +18,55 @@
 #ifndef MKIT_CONSOLE_H
 #define MKIT_CONSOLE_H
 
+#include "microkit/lib/types.h"
+
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 /**
- * @brief Initializes the console.
+ * @brief Console interface.
  */
-void console_init();
+typedef struct {
+   /**
+    * @brief Initializes the console.
+    */
+   void (*init)(void);
 
-void console_start();
+   /**
+    * @brief Starts the console.
+    */
+   void (*start)(void);
 
-void console_stop();
+   /**
+    * @brief Stops the console.
+    */
+   void (*stop)(void);
+
+   /**
+    * @brief Reads a message with maxLength from the console.
+    * @param message The received message.
+    * @param maxLength The maximum length of the message.
+    * @return The number of received characters.
+    */
+   int (*read)(char* message, int maxLength);
+
+   /**
+    * @brief Writes the message to the console.
+    * @param message The message to be sent.
+    */
+   void (*write)(const char* message);
+
+   /**
+    * @brief Writes a message and a line feed to the console.
+    * @param message The message to be sent.
+    */
+   void (*writeLine)(const char* message);
+
+} ConsoleInterface;
 
 /**
- * @brief Reads a message with maxLength from the console.
- * @param message The received message.
- * @param maxLength The maximum length of the message.
- * @return The number of received characters.
+ * @brief The singleton instance of the console.
  */
-int console_read(char* message, int maxLength);
-
-/**
- * @brief Writes a message to the console.
- * @param message The message to be sent.
- */
-void console_write(char* message);
+extern ConsoleInterface Console;
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 #endif
