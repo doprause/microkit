@@ -16,6 +16,7 @@ typedef enum {
    MKIT_LOG_LEVEL_WARN,
    MKIT_LOG_LEVEL_ERROR,
    MKIT_LOG_LEVEL_FATAL,
+   MKIT_LOG_LEVEL_FORCE
 } LogLevel;
 
 typedef struct {

@@ -6,6 +6,9 @@
 #include <string.h>
 #include <time.h>
 
+#define FILE __FILE__
+#define LINE __LINE__
+
 typedef struct {
    int seconds;          /* seconds,  range 0 to 59          */
    int minutes;          /* minutes, range 0 to 59           */
@@ -39,13 +42,14 @@ Private private = {
 
 // static char* private_format;
 static const char*
-    private_level_strings[] = {"TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL"};
+    private_level_strings[] = {"TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL", "FORCE"};
 
 #ifdef MICROKIT_CONFIG_LOGGER_USE_COLORS
 static const char* private_level_colors[] = {
-    "\033[94m", "\033[36m", "\033[32m", "\033[33m", "\033[31m", "\033[35m"};
+    "\033[94m", "\033[36m", "\033[32m", "\033[33m", "\033[31m", "\033[35m", "\033[0m"};
 #endif
 
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 static void private_log(const LogLevel level, const char* file, int line, const char* message, va_list args) {
 
    char formatted_time[16];
@@ -76,24 +80,43 @@ static void private_log(const LogLevel level, const char* file, int line, const 
 #endif
 }
 
-static void init(void) {}
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+static void init(void) {
+   // Nothing to do
+}
 
-#define FILE __FILE__
-#define LINE __LINE__
-
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 static void write(const LogLevel level, const char* message, ...) {
 
    if (level < private.level) {
       return;
    }
 
-   va_list args;
-   va_start(args, message);
-   private_log(level, FILE, LINE, message, args);
-   va_end(args);
+   if (level >= private.level) {
+      va_list args;
+      va_start(args, message);
+      private_log(level, FILE, LINE, message, args);
+      va_end(args);
+   }
 }
 
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+static LogLevel getLevel(void) {
+   return private.level;
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+static void setLevel(const LogLevel level) {
+
+   if (level >= MKIT_LOG_LEVEL_TRACE && level <= MKIT_LOG_LEVEL_FATAL) {
+      private.level = level;
+   }
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 MicroKitLoggerInterface Logger = {
     .init = init,
     .log = write,
+    .getLevel = getLevel,
+    .setLevel = setLevel,
 };
