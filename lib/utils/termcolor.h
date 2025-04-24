@@ -25,8 +25,8 @@
 #define TERMCOLOR_BLINK "\033[5m"
 #define TERMCOLOR_REVERSE "\033[7m"
 #define TERMCOLOR_CONCEALED "\033[8m"
-#define TERMCOLOR_GRAY "\033[30m"
-#define TERMCOLOR_GREY "\033[30m"
+#define TERMCOLOR_GRAY "\033[90m"
+#define TERMCOLOR_GREY "\033[90m"
 #define TERMCOLOR_RED "\033[31m"
 #define TERMCOLOR_GREEN "\033[32m"
 #define TERMCOLOR_YELLOW "\033[33m"
@@ -53,7 +53,7 @@
  * @brief colorizes the given text with the given ANSI
  * foreground and background color
  */
-#define colorize2(text, foreground, background)                                \
+#define colorize2(text, foreground, background) \
    foreground background text TERMCOLOR_RESET
 
 #endif
