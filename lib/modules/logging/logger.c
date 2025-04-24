@@ -52,7 +52,7 @@ static void private_log(const LogLevel level, const char* file, int line, const 
    // time_t t = time(NULL);
    // formatted_time[strftime(formatted_time, sizeof(formatted_time), "%H:%M:%S", localtime(&t))] = '\0';
    // formatted_time[strftime(formatted_time, sizeof(formatted_time), "%H:%M:%S", time(NULL))] = '\0';
-   strncpy(formatted_time, "12:34:56", sizeof(formatted_time));
+   strncpy(formatted_time, "--:--:--", sizeof(formatted_time));
 
    char formatted_message[64];
    formatted_message[vsnprintf(formatted_message, sizeof(formatted_message), message, args)] = '\0';
