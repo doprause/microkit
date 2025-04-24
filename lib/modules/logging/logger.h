@@ -55,7 +55,7 @@ typedef struct {
 } LoggerInterface;
 
 /**
- * @brief The logger instance.
+ * @brief The singleton logger instance.
  */
 extern LoggerInterface Logger;
 
