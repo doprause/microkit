@@ -3,7 +3,7 @@
 #include "microkit/lib/assert.h"
 #include "microkit/lib/config/mcu.h"
 #include "microkit/lib/config/os.h"
-#include "microkit/lib/contracts/platform/sysio.h"
+#include "microkit/lib/contracts/platform/stdio.h"
 
 #include "stm32h5xx_hal.h"
 
@@ -41,7 +41,7 @@ struct UartDeviceObject DEVICE_UART2 = {.state = MKIT_UART_STATE_CREATED,
 #if defined(CONFIG_MCU_USE_UART1)
 UartDevice DEVICE_CONSOLE = &DEVICE_UART1;
 #else
-#error                                                                         \
+#error \
     "To use USART1 for the console, configure CONFIG_MCU_USE_UART1 in config/mcu.h"
 #endif
 #endif
@@ -50,7 +50,7 @@ UartDevice DEVICE_CONSOLE = &DEVICE_UART1;
 #if defined(CONFIG_MCU_USE_UART2)
 const UartDevice DEVICE_CONSOLE = &DEVICE_UART2;
 #else
-#error                                                                         \
+#error \
     "To use USART2 for the console, configure CONFIG_MCU_USE_UART2 in config/mcu.h"
 #endif
 #endif
@@ -161,7 +161,7 @@ int uart_send(const UartDevice device, UInt8* data, const Size size) {
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    👉 SYSIO interface implementation
    - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-int sysio_get(void) {
+int mkit_platform_stdio_get(void) {
 
    ASSERT(DEVICE_CONSOLE->state == MKIT_UART_STATE_STARTED);
 
@@ -174,7 +174,7 @@ int sysio_get(void) {
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-void sysio_put(int c) {
+void mkit_platform_stdio_put(int c) {
 
    ASSERT(DEVICE_CONSOLE->state == MKIT_UART_STATE_STARTED);
 

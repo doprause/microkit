@@ -1,28 +1,9 @@
 
 #include "console.h"
-#include "microkit/lib/contracts/platform/drivers/uart.h"
-#include "microkit/lib/contracts/platform/sysio.h"
+#include "microkit/lib/contracts/platform/stdio.h"
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-void console_log(char* message) {
-   console_put("[LOG  ] ");
-   console_put(message);
-}
-
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-void console_warn(char* message) {
-   console_put("[WARN ] ");
-   console_put(message);
-}
-
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-void console_error(char* message) {
-   console_put("[ERROR] ");
-   console_put(message);
-}
-
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-int console_get(char* message, int length) {
+int console_read(char* message, int length) {
 
    char* received = message;
    char c;
@@ -30,9 +11,9 @@ int console_get(char* message, int length) {
    *received = '\000';
 
    /* read until a <LF> is received */
-   while ((c = sysio_get()) != '\r') {
+   while ((c = mkit_platform_stdio_get()) != '\r') {
       *received = c;
-      sysio_put(c);
+      mkit_platform_stdio_put(c);
       if ((received - message) < length) {
          received++;
       }
@@ -45,13 +26,13 @@ int console_get(char* message, int length) {
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-void console_put(char* message) {
+void console_write(char* message) {
 
    while (*message != '\0') {
       if (*message == '\r') {
-         sysio_put('\n');
+         mkit_platform_stdio_put('\n');
       } else {
-         sysio_put(*message);
+         mkit_platform_stdio_put(*message);
       }
       message++;
    }

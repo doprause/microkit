@@ -8,15 +8,15 @@
  * @example
  * char message[64];
  *
- * console_put("\r$ ");
- *  if (console_get(message, 64) > 0) {
- *      console_put(message);
- *      console_put("> OK\n");
+ * console_write("\r$ ");
+ *  if (console_read(message, 64) > 0) {
+ *      console_write(message);
+ *      console_write("> OK\n");
  *  }
  * - - - - - -- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-#ifndef MICROKIT_CONSOLE_H
-#define MICROKIT_CONSOLE_H
+#ifndef MKIT_CONSOLE_H
+#define MKIT_CONSOLE_H
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
@@ -29,27 +29,19 @@ void console_start();
 
 void console_stop();
 
-void console_log(char* message);
-
-void console_warn(char* message);
-
-void console_error(char* message);
-
 /**
- * @brief Gets a message with maxLength from the console.
- *
+ * @brief Reads a message with maxLength from the console.
  * @param message The received message.
  * @param maxLength The maximum length of the message.
  * @return The number of received characters.
  */
-int console_get(char* message, int maxLength);
+int console_read(char* message, int maxLength);
 
 /**
- * @brief Puts a message to the console.
- *
+ * @brief Writes a message to the console.
  * @param message The message to be sent.
  */
-void console_put(char* message);
+void console_write(char* message);
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 #endif

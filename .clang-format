@@ -3,5 +3,5 @@
   "IndentWidth": 3,
   "DerivePointerAlignment": false,
   "PointerAlignment": "Left",
-  "ColumnLimit": 80,
+  "ColumnLimit": 0,
 }
