@@ -1,8 +1,8 @@
 
-#include "microkit/lib/contracts/platform/drivers/uart.h"
 #include "microkit/lib/assert.h"
 #include "microkit/lib/config/mcu.h"
 #include "microkit/lib/config/os.h"
+#include "microkit/lib/contracts/platform/drivers/uart.h"
 #include "microkit/lib/contracts/platform/stdio.h"
 
 #include "stm32h5xx_hal.h"
@@ -66,7 +66,7 @@ static UInt uart_convert_parity_for_mcu(UartParity parity);
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    👉 UART interface implementation
    - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-void uart_init() {
+static void uart_init() {
 
 #if CONFIG_MCU_USE_UART1
    DEVICE_UART1.mcu.Instance = USART1;
@@ -102,7 +102,7 @@ void uart_init() {
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-void uart_start(const UartDevice device, UartConfig config) {
+static void uart_start(const UartDevice device, UartConfig config) {
 
    ASSERT_NOT_NULL_POINTER(device);
 
@@ -131,7 +131,7 @@ void uart_start(const UartDevice device, UartConfig config) {
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-void uart_stop(const UartDevice device) {
+static void uart_stop(const UartDevice device) {
 
    ASSERT_NOT_NULL_POINTER(device);
 
@@ -141,21 +141,23 @@ void uart_stop(const UartDevice device) {
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-int uart_receive(const UartDevice device, UInt8* data, const Size size) {
+static int uart_receive(const UartDevice device, UInt8* data, const Size size) {
 
    ASSERT_NOT_NULL_POINTER(device);
    ASSERT(device->state == MKIT_UART_STATE_STARTED);
 
-   return HAL_UART_Receive(&device->mcu, data, size, 100) == HAL_OK ? 0 : -1;
+   // volatile HAL_StatusTypeDef ret = HAL_UART_Receive(&device->mcu, data, size, 1);
+
+   return HAL_UART_Receive(&device->mcu, data, size, 1) == HAL_OK ? STATUS_OK : STATUS_ERROR;
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-int uart_send(const UartDevice device, UInt8* data, const Size size) {
+static int uart_send(const UartDevice device, UInt8* data, const Size size) {
 
    ASSERT_NOT_NULL_POINTER(device);
    ASSERT(device->state == MKIT_UART_STATE_STARTED);
 
-   return HAL_UART_Transmit(&device->mcu, data, size, 0) == HAL_OK ? 0 : -1;
+   return HAL_UART_Transmit(&device->mcu, data, size, 0) == HAL_OK ? STATUS_OK : STATUS_ERROR;
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -244,3 +246,12 @@ static UInt uart_convert_parity_for_mcu(UartParity parity) {
       return UART_PARITY_NONE;
    }
 }
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+UartInterface Uart = {
+    .init = uart_init,
+    .start = uart_start,
+    .stop = uart_stop,
+    .receive = uart_receive,
+    .send = uart_send,
+};

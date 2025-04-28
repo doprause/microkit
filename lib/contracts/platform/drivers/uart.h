@@ -26,7 +26,8 @@ typedef enum { MKIT_UART_DATABITS_8 } UartDataBits;
 /**
  * @brief UART stop bits settings.
  */
-typedef enum { MKIT_UART_STOPBITS_1, MKIT_UART_STOPBITS_2 } UartStopBits;
+typedef enum { MKIT_UART_STOPBITS_1,
+               MKIT_UART_STOPBITS_2 } UartStopBits;
 
 /**
  * @brief UART parity settings.
@@ -55,43 +56,47 @@ typedef struct UartDeviceObject* UartDevice;
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-/**
- * @brief Initializes the enabled UART devices.
- * UART devices can be enabled in the MCU configuration file.
- */
-void uart_init(void);
+typedef struct {
+   /**
+    * @brief Initializes the enabled UART devices.
+    * UART devices can be enabled in the MCU configuration file.
+    */
+   void (*init)(void);
 
-/**
- * @brief Starts and initializes the given UART device with the given
- * configuration.
- * @param device The device.
- * @param config The config.
- */
-void uart_start(const UartDevice device, UartConfig config);
+   /**
+    * @brief Starts and initializes the given UART device with the given
+    * configuration.
+    * @param device The device.
+    * @param config The config.
+    */
+   void (*start)(const UartDevice device, UartConfig config);
 
-/**
- * @brief Stops and de-initializes the given UART device.
- * @param device The device.
- */
-void uart_stop(const UartDevice device);
+   /**
+    * @brief Stops and de-initializes the given UART device.
+    * @param device The device.
+    */
+   void (*stop)(const UartDevice device);
 
-/**
- * @brief Sends the given data over the UART device.
- * @param device The device.
- * @param data The data to be sent.
- * @param length The length of the data to be sent.
- * @return The number of bytes sent.
- */
-Int uart_send(const UartDevice device, UInt8* data, Size length);
+   /**
+    * @brief Sends the given data over the UART device.
+    * @param device The device.
+    * @param data The data to be sent.
+    * @param length The length of the data to be sent.
+    * @return The number of bytes sent.
+    */
+   Int (*send)(const UartDevice device, UInt8* data, Size length);
 
-/**
- * @brief Receives up to maxLength bytes from the UART device.
- * @param device The device.
- * @param data The received data.
- * @param maxLength The maximum number of bytes to receive.
- * @return The number of bytes actually received.
- */
-Int uart_receive(const UartDevice device, UInt8* data, Size maxLength);
+   /**
+    * @brief Receives up to maxLength bytes from the UART device.
+    * @param device The device.
+    * @param data The received data.
+    * @param maxLength The maximum number of bytes to receive.
+    * @return The number of bytes actually received.
+    */
+   Int (*receive)(const UartDevice device, UInt8* data, Size maxLength);
 
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+} UartInterface;
+
+extern UartInterface Uart;
+
 #endif
