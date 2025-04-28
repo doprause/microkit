@@ -83,7 +83,7 @@ static inline void rearm_i2c_slave_mode(const I2cDevice device);
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    👉 I2C lifecycle functions
    - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-void i2c_init(void) {
+static void init(void) {
 
 #if CONFIG_MCU_USE_I2C1
    DEVICE_I2C1->mcu.Instance = I2C1;
@@ -129,7 +129,7 @@ void i2c_init(void) {
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-void i2c_start(const I2cDevice device, I2cConfig config) {
+static void start(const I2cDevice device, I2cConfig config) {
 
    ASSERT_NOT_NULL_POINTER(device);
 
@@ -184,7 +184,7 @@ void i2c_start(const I2cDevice device, I2cConfig config) {
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-void i2c_stop(const I2cDevice device) {
+static void stop(const I2cDevice device) {
 
    ASSERT_NOT_NULL_POINTER(device);
 
@@ -194,8 +194,8 @@ void i2c_stop(const I2cDevice device) {
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    👉 I2C master mode functions
    - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-StatusOrNumber i2c_receive(const I2cDevice device, UInt8 deviceAddress,
-                           UInt8* data, Size dataSize, Bool async) {
+static StatusOrNumber receive(const I2cDevice device, UInt8 deviceAddress,
+                              UInt8* data, Size dataSize, Bool async) {
 
    ASSERT_NOT_NULL_POINTER(device);
 
@@ -222,8 +222,8 @@ StatusOrNumber i2c_receive(const I2cDevice device, UInt8 deviceAddress,
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-StatusOrNumber i2c_transmit(const I2cDevice device, const UInt8 deviceAddress,
-                            UInt8* data, Size dataSize, Bool async) {
+static StatusOrNumber transmit(const I2cDevice device, const UInt8 deviceAddress,
+                               UInt8* data, Size dataSize, Bool async) {
 
    ASSERT_NOT_NULL_POINTER(device);
 
@@ -252,9 +252,9 @@ StatusOrNumber i2c_transmit(const I2cDevice device, const UInt8 deviceAddress,
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    👉 I2C master mode memory read/write functions
    - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-StatusOrNumber i2c_memory_read(const I2cDevice device, const UInt8 deviceAddress,
-                               const UInt16 memoryAddress, const UInt16 memoryAddressSize,
-                               UInt8* data, const Size dataSize, const Bool async) {
+static StatusOrNumber memoryRead(const I2cDevice device, const UInt8 deviceAddress,
+                                 const UInt16 memoryAddress, const UInt16 memoryAddressSize,
+                                 UInt8* data, const Size dataSize, const Bool async) {
 
    ASSERT_NOT_NULL_POINTER(device);
 
@@ -280,9 +280,9 @@ StatusOrNumber i2c_memory_read(const I2cDevice device, const UInt8 deviceAddress
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-StatusOrNumber i2c_memory_write(const I2cDevice device, const UInt8 deviceAddress,
-                                const UInt16 memoryAddress, const UInt16 memoryAddressSize,
-                                const UInt8* data, const Size dataSize, const Bool async) {
+static StatusOrNumber memoryWrite(const I2cDevice device, const UInt8 deviceAddress,
+                                  const UInt16 memoryAddress, const UInt16 memoryAddressSize,
+                                  const UInt8* data, const Size dataSize, const Bool async) {
 
    ASSERT_NOT_NULL_POINTER(device);
 
@@ -605,3 +605,14 @@ void I2C2_ER_IRQHandler(void) { HAL_I2C_ER_IRQHandler(&DEVICE_I2C2->mcu); }
 #if CONFIG_MCU_USE_I2C3
 void I2C3_ER_IRQHandler(void) { HAL_I2C_ER_IRQHandler(&DEVICE_I2C3->mcu); }
 #endif
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+I2cInterface I2c = {
+    .init = init,
+    .start = start,
+    .stop = stop,
+    .receive = receive,
+    .transmit = transmit,
+    .memoryRead = memoryRead,
+    .memoryWrite = memoryWrite,
+};

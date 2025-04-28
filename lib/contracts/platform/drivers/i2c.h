@@ -19,12 +19,14 @@ typedef enum {
 /**
  * @brief I2C mode settings.
  */
-typedef enum { MKIT_I2C_MODE_MASTER, MKIT_I2C_MODE_SLAVE } I2cMode;
+typedef enum { MKIT_I2C_MODE_MASTER,
+               MKIT_I2C_MODE_SLAVE } I2cMode;
 
 /**
  * @brief I2C transmission direction.
  */
-typedef enum { MKIT_I2C_DIRECTION_READ, MKIT_I2C_DIRECTION_WRITE } I2cDirection;
+typedef enum { MKIT_I2C_DIRECTION_READ,
+               MKIT_I2C_DIRECTION_WRITE } I2cDirection;
 
 /**
  * I2C device pointer.
@@ -98,89 +100,96 @@ typedef struct {
    I2cSlaveByteRequestedHandler slaveByteRequestedHandler;
 } I2cConfig;
 
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+typedef struct {
+
+   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    👉 I2C lifecycle functions
    - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-/**
- * @brief Initializes the enabled I2C devices.
- * I2C devices can be enabled in the MCU configuration file.
- */
-void i2c_init(void);
+   /**
+    * @brief Initializes the enabled I2C devices.
+    * I2C devices can be enabled in the MCU configuration file.
+    */
+   void (*init)(void);
 
-/**
- * @brief Starts and initializes the given I2C device with the given
- * configuration.
- * @param device The device.
- * @param config The config.
- */
-void i2c_start(const I2cDevice device, I2cConfig config);
+   /**
+    * @brief Starts and initializes the given I2C device with the given
+    * configuration.
+    * @param device The device.
+    * @param config The config.
+    */
+   void (*start)(const I2cDevice device, I2cConfig config);
 
-/**
- * @brief Stops and de-initializes the given I2C device.
- * @param device The device.
- */
-void i2c_stop(const I2cDevice device);
+   /**
+    * @brief Stops and de-initializes the given I2C device.
+    * @param device The device.
+    */
+   void (*stop)(const I2cDevice device);
 
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-   👉 I2C master mode functions
-   - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+      👉 I2C master mode functions
+      - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-/**
- * @brief Reads up to #dataSize bytes from the slave device.
- * @param device The device.
- * @param deviceAddress The slave device address.
- * @param[out] data The buffer to store the received data.
- * @param dataSize The length of the data to be received.
- * @param async Whether to perform the operation asynchronously.
- * @returns A status code (STATUS_OK on success, STATUS_ERROR on error).
- */
-StatusOrNumber i2c_receive(const I2cDevice device, UInt8 deviceAddress,
-                           UInt8* data, Size dataSize, Bool async);
+   /**
+    * @brief Reads up to #dataSize bytes from the slave device.
+    * @param device The device.
+    * @param deviceAddress The slave device address.
+    * @param[out] data The buffer to store the received data.
+    * @param dataSize The length of the data to be received.
+    * @param async Whether to perform the operation asynchronously.
+    * @returns A status code (STATUS_OK on success, STATUS_ERROR on error).
+    */
+   StatusOrNumber (*receive)(const I2cDevice device, UInt8 deviceAddress,
+                             UInt8* data, Size dataSize, Bool async);
 
-/**
- * @brief Writes #dataSize bytes to the slave device.
- * @param device The device.
- * @param deviceAddress The slave deviceAddress.
- * @param data The data to transmit.
- * @param dataSize The length of the data to be transmitted.
- * @param async Whether to perform the operation asynchronously.
- * @returns A status code (STATUS_OK on success, STATUS_ERROR on error).
- */
-StatusOrNumber i2c_transmit(const I2cDevice device, UInt8 deviceAddress,
-                            UInt8* data, Size dataSize, Bool async);
+   /**
+    * @brief Writes #dataSize bytes to the slave device.
+    * @param device The device.
+    * @param deviceAddress The slave deviceAddress.
+    * @param data The data to transmit.
+    * @param dataSize The length of the data to be transmitted.
+    * @param async Whether to perform the operation asynchronously.
+    * @returns A status code (STATUS_OK on success, STATUS_ERROR on error).
+    */
+   StatusOrNumber (*transmit)(const I2cDevice device, UInt8 deviceAddress,
+                              UInt8* data, Size dataSize, Bool async);
 
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-   👉 I2C master mode memory read/write functions
-   - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+      👉 I2C master mode memory read/write functions
+      - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-/**
- * @brief Reads up to #dataSize bytes from the slave device.
- * @param device The device.
- * @param deviceAddress The slave device address.
- * @param memoryAddress The memory address within the slave device to read from.
- * @param[out] data The buffer to store the received data.
- * @param dataSize The maximum size of the data to be received.
- * @returns A status code (STATUS_OK on success, STATUS_ERROR on error)
- * or the number of bytes actually read.
- */
-StatusOrNumber i2c_memory_read(const I2cDevice device, const UInt8 deviceAddress,
-                               const UInt16 memoryAddress, const UInt16 memoryAddressSize,
-                               UInt8* data, const Size dataSize, const Bool async);
-
-/**
- * @brief Writes up to #dataSize bytes to the slave device.
- * @param device The device.
- * @param deviceAddress The slave device address.
- * @param memoryAddress The memory address within the slave device to write to.
- * @param[out] data The buffer to write the data from.
- * @param length The length of the data to be written.
- * @returns A status code (STATUS_OK on success, STATUS_ERROR on error)
- * or the number of bytes actually written.
- */
-StatusOrNumber i2c_memory_write(const I2cDevice device, const UInt8 deviceAddress,
+   /**
+    * @brief Reads up to #dataSize bytes from the slave device.
+    * @param device The device.
+    * @param deviceAddress The slave device address.
+    * @param memoryAddress The memory address within the slave device to read from.
+    * @param[out] data The buffer to store the received data.
+    * @param dataSize The maximum size of the data to be received.
+    * @returns A status code (STATUS_OK on success, STATUS_ERROR on error)
+    * or the number of bytes actually read.
+    */
+   StatusOrNumber (*memoryRead)(const I2cDevice device, const UInt8 deviceAddress,
                                 const UInt16 memoryAddress, const UInt16 memoryAddressSize,
-                                const UInt8* data, const Size dataSize, const Bool async);
+                                UInt8* data, const Size dataSize, const Bool async);
 
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+   /**
+    * @brief Writes up to #dataSize bytes to the slave device.
+    * @param device The device.
+    * @param deviceAddress The slave device address.
+    * @param memoryAddress The memory address within the slave device to write to.
+    * @param[out] data The buffer to write the data from.
+    * @param length The length of the data to be written.
+    * @returns A status code (STATUS_OK on success, STATUS_ERROR on error)
+    * or the number of bytes actually written.
+    */
+   StatusOrNumber (*memoryWrite)(const I2cDevice device, const UInt8 deviceAddress,
+                                 const UInt16 memoryAddress, const UInt16 memoryAddressSize,
+                                 const UInt8* data, const Size dataSize, const Bool async);
+
+} I2cInterface;
+
+extern I2cInterface I2c;
+
 #endif
