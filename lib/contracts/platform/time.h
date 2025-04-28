@@ -10,4 +10,6 @@
  */
 UInt64 microkit_time_ms_since_boot(void);
 
+void microkit_time_delay_ms(UInt32 milliseconds);
+
 #endif
