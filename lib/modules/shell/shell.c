@@ -290,7 +290,6 @@ void write(const ShellModule instance, const char* message) {
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 const ShellInterface Shell = {
     .init = init,
-    //  .disable = disable,
     .start = start,
     .stop = stop,
     .process = process,
