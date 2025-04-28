@@ -132,11 +132,11 @@ typedef struct {
    void (*process)(const ShellModule shell);
 
    /**
-    * @brief Sends a response to the CLI.
-    * @param instance The instance.
-    * @param message The response message.
+    * @brief Writes the message to the shell output.
+    * @param shell The shell.
+    * @param message The message to be written.
     */
-   void (*respond)(const ShellModule shell, const char* message);
+   void (*write)(const ShellModule shell, const char* message);
 
    // /**
    //  * @brief Gets the power simulator instance.

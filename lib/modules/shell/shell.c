@@ -264,7 +264,7 @@ static void process(const ShellModule instance) {
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-void respond(const ShellModule instance, const char* message) {
+void write(const ShellModule instance, const char* message) {
 
    ASSERT_NOT_NULL_POINTER(instance);
 
@@ -294,7 +294,7 @@ const ShellInterface Shell = {
     .start = start,
     .stop = stop,
     .process = process,
-    .respond = respond,
+    .write = write,
     //  .powerSimulator = powerSimulator,
     //  .supervisor = supervisor,
 };
