@@ -1,6 +1,6 @@
 
-#include "microkit/lib/config/i2c.h"
 #include "microkit/lib/assert.h"
+#include "microkit/lib/config/i2c.h"
 #include "microkit/lib/config/mcu.h"
 #include "microkit/lib/contracts/platform/drivers/i2c.h"
 #include "microkit/lib/debug.h"
