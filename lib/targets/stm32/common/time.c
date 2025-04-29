@@ -1,11 +1,20 @@
+#include "libs/microkit/lib/core.h"
+#include "libs/microkit/lib/platform/time.h"
+#include "microkit/config/microkit.h"
+#include "microkit/config/time.h"
 
-#include "microkit/lib/contracts/platform/time.h"
 #include <stm32h5xx_hal.h>
 
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_TIME)
+
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_TIME_DELAY_MICROS)
 void microkit_time_delay_micros(UInt32 micros) {
-   HAL_Delay(micros); // TODO: Dummy implementation
+   // TODO: To be implemented
 }
+#endif
 
 void microkit_time_delay_millis(UInt32 millis) {
    HAL_Delay(millis);
 }
+
+#endif

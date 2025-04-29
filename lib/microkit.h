@@ -1,14 +1,15 @@
 #ifndef MICROKIT_H
 #define MICROKIT_H
 
-#include "microkit/lib/time.h"
+#include "libs/microkit/lib/core.h"
+#include "libs/microkit/lib/time.h"
 
 typedef struct {
    void (*init)(void);
    void (*start)(void);
    void (*stop)(void);
 
-#if defined(MICROKIT_USE_TIME)
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_TIME)
    MicrokitTimeInterface time;
 #endif
 } MicrokitInterface;

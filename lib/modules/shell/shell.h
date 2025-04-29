@@ -1,12 +1,23 @@
-
-
-#ifndef MKIT_SHELL_H
-#define MKIT_SHELL_H
+/**
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ * @file shell.h
+ * @author Dominik Prause
+ * @version 0.1
+ * @date 2025-04-17
+ * @copyright Copyright (c) 2025 - All rights reserved.
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#ifndef MICROKIT_SHELL_H
+#define MICROKIT_SHELL_H
 
 // #include "framework/software_timer.h"
 
-#include "microkit/lib/contracts/platform/drivers/uart.h"
+#include "libs/microkit/lib/core.h"
+#include "libs/microkit/lib/platform/drivers/uart.h"
+#include "microkit/config/shell.h"
 // #include "platform/api/serial.h"
+
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_SHELL)
 
 #ifndef CLI_MAX_BUFFER_SIZE
 #define CLI_MAX_BUFFER_SIZE 128
@@ -158,5 +169,6 @@ typedef struct {
 
 extern const ShellInterface Shell;
 
-// ----------------------------------------------------------------------------
-#endif
+#endif // MICROKIT_CONFIG_USE_SHELL
+
+#endif // MICROKIT_SHELL_H

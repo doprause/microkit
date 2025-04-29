@@ -15,12 +15,14 @@
  *  }
  * - - - - - -- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-#ifndef MKIT_CONSOLE_H
-#define MKIT_CONSOLE_H
+#ifndef MICROKIT_CONSOLE_H
+#define MICROKIT_CONSOLE_H
 
-#include "microkit/lib/types.h"
+#include "libs/microkit/lib/core.h"
+#include "libs/microkit/lib/types.h"
+#include "microkit/config/console.h"
 
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_CONSOLE)
 
 /**
  * @brief Console interface.
@@ -68,5 +70,6 @@ typedef struct {
  */
 extern ConsoleInterface Console;
 
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-#endif
+#endif // MICROKIT_CONFIG_USE_CONSOLE
+
+#endif // MICROKIT_CONSOLE_H

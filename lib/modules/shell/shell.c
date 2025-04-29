@@ -1,7 +1,8 @@
 #include "shell.h"
 
-#include "microkit/lib/assert.h"
-#include "microkit/lib/utils/termcolor.h"
+#include "libs/microkit/lib/assert.h"
+#include "libs/microkit/lib/utils/termcolor.h"
+#include "libs/microkit/lib/platform/stdio.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -74,7 +75,6 @@ static Status private_interpret(const ShellModule instance) {
    return STATUS_ERROR_UNKNOWN_COMMAND;
 }
 
-#include "microkit/lib/contracts/platform/stdio.h"
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 static void private_print(const ShellModule shell, const char* message) {

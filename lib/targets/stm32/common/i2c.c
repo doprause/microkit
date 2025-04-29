@@ -1,10 +1,10 @@
+#include "libs/microkit/lib/assert.h"
+#include "libs/microkit/lib/core.h"
+#include "libs/microkit/lib/debug.h"
+#include "libs/microkit/lib/modules/logging/logger.h"
+#include "libs/microkit/lib/platform/drivers/i2c.h"
+#include "microkit/config/i2c.h"
 
-#include "microkit/lib/assert.h"
-#include "microkit/lib/config/i2c.h"
-#include "microkit/lib/config/mcu.h"
-#include "microkit/lib/contracts/platform/drivers/i2c.h"
-#include "microkit/lib/debug.h"
-#include "microkit/lib/modules/logging/logger.h"
 
 #include "stm32h5xx_hal.h"
 
@@ -57,23 +57,23 @@ struct I2cDeviceObject {
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    👉 Configuration
    - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-#if CONFIG_MCU_USE_I2C1
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_I2C_USE_I2C1)
 struct I2cDeviceObject DEVICE_I2C1_INSTANCE = {.state = MKIT_I2C_STATE_CREATED,
                                                .mcu = {0}};
 I2cDevice DEVICE_I2C1 = &DEVICE_I2C1_INSTANCE;
-#endif
+#endif // MICROKIT_CONFIG_I2C_USE_I2C1
 
-#if CONFIG_MCU_USE_I2C2
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_I2C_USE_I2C2)
 struct I2cDeviceObject DEVICE_I2C2_INSTANCE = {.state = MKIT_I2C_STATE_CREATED,
                                                .mcu = {0}};
 I2cDevice DEVICE_I2C2 = &DEVICE_I2C2_INSTANCE;
-#endif
+#endif // MICROKIT_CONFIG_I2C_USE_I2C2
 
-#if CONFIG_MCU_USE_I2C3
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_I2C_USE_I2C3)
 struct I2cDeviceObject DEVICE_I2C3_INSTANCE = {.state = MKIT_I2C_STATE_CREATED,
                                                .mcu = {0}};
 I2cDevice DEVICE_I2C3 = &DEVICE_I2C3_INSTANCE;
-#endif
+#endif // MICROKIT_CONFIG_I2C_USE_I2C3
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    👉 Forward declarations
@@ -85,7 +85,7 @@ static inline void rearm_i2c_slave_mode(const I2cDevice device);
    - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 static void init(void) {
 
-#if CONFIG_MCU_USE_I2C1
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_I2C_USE_I2C1)
    DEVICE_I2C1->mcu.Instance = I2C1;
    DEVICE_I2C1->mcu.Init.Timing = 0x00707CBB;
    DEVICE_I2C1->mcu.Init.OwnAddress1 = 0;
@@ -99,7 +99,7 @@ static void init(void) {
    DEVICE_I2C1->state = MKIT_I2C_STATE_STOPPED;
 #endif
 
-#if CONFIG_MCU_USE_I2C2
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_I2C_USE_I2C2)
    DEVICE_I2C2->mcu.Instance = I2C2;
    DEVICE_I2C2->mcu.Init.Timing = 0x00707CBB;
    DEVICE_I2C2->mcu.Init.OwnAddress1 = 0;
@@ -113,7 +113,7 @@ static void init(void) {
    DEVICE_I2C2->state = MKIT_I2C_STATE_STOPPED;
 #endif
 
-#if CONFIG_MCU_USE_I2C3
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_I2C_USE_I2C3)
    DEVICE_I2C3->mcu.Instance = I2C3;
    DEVICE_I2C3->mcu.Init.Timing = 0x00707CBB;
    DEVICE_I2C3->mcu.Init.OwnAddress1 = 0;
@@ -308,17 +308,17 @@ static StatusOrNumber memoryWrite(const I2cDevice device, const UInt8 deviceAddr
    👉 Vendor specific code
    - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 static inline I2cDevice get_device_from_handle(I2C_HandleTypeDef* handle) {
-#if CONFIG_MCU_USE_I2C1
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_I2C_USE_I2C1)
    if (handle == &DEVICE_I2C1->mcu) {
       return DEVICE_I2C1;
    }
 #endif
-#if CONFIG_MCU_USE_I2C2
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_I2C_USE_I2C2)
    if (handle == &DEVICE_I2C2->mcu) {
       return DEVICE_I2C2;
    }
 #endif
-#if CONFIG_MCU_USE_I2C3
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_I2C_USE_I2C3)
    if (handle == &DEVICE_I2C3->mcu) {
       return DEVICE_I2C3;
    }
@@ -402,7 +402,7 @@ void HAL_I2C_MemTxCpltCallback(I2C_HandleTypeDef* handle) {
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-#if CONFIG_I2C_USE_SLAVE_MODE // 👉 Slave mode code
+#if defined(CONFIG_I2C_USE_SLAVE_MODE) // 👉 Slave mode code
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 void HAL_I2C_AddrCallback(I2C_HandleTypeDef* handle, uint8_t TransferDirection,
                           uint16_t AddrMatchCode) {
@@ -577,32 +577,32 @@ void HAL_I2C_ErrorCallback(I2C_HandleTypeDef* handle) {
    }
 }
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-#endif
+#endif // CONFIG_I2C_USE_SLAVE_MODE
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-#if CONFIG_MCU_USE_I2C1
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_I2C_USE_I2C1)
 void I2C1_EV_IRQHandler(void) { HAL_I2C_EV_IRQHandler(&DEVICE_I2C1->mcu); }
 #endif
 
-#if CONFIG_MCU_USE_I2C2
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_I2C_USE_I2C2)
 void I2C2_EV_IRQHandler(void) { HAL_I2C_EV_IRQHandler(&DEVICE_I2C2->mcu); }
 #endif
 
-#if CONFIG_MCU_USE_I2C3
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_I2C_USE_I2C3)
 void I2C3_EV_IRQHandler(void) { HAL_I2C_EV_IRQHandler(&DEVICE_I2C3->mcu); }
 #endif
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-#if CONFIG_MCU_USE_I2C1
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_I2C_USE_I2C1)
 void I2C1_ER_IRQHandler(void) { HAL_I2C_ER_IRQHandler(&DEVICE_I2C1->mcu); }
 #endif
 
-#if CONFIG_MCU_USE_I2C2
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_I2C_USE_I2C2)
 void I2C2_ER_IRQHandler(void) { HAL_I2C_ER_IRQHandler(&DEVICE_I2C2->mcu); }
 #endif
 
-#if CONFIG_MCU_USE_I2C3
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_I2C_USE_I2C3)
 void I2C3_ER_IRQHandler(void) { HAL_I2C_ER_IRQHandler(&DEVICE_I2C3->mcu); }
 #endif
 

@@ -1,6 +1,13 @@
-
-
-#include "microkit/lib/contracts/platform/assert.h"
+/**
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ * @file assert.c
+ * @author Dominik Prause
+ * @version 0.1
+ * @date 2025-04-17
+ * @copyright Copyright (c) 2025 - All rights reserved.
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#include "libs/microkit/lib/platform/assert.h"
 
 #include <stm32h533xx.h>
 #include <stm32h5xx_hal.h>

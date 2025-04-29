@@ -1,15 +1,7 @@
 /**
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- *                 oo                            dP       oo   dP
- *                                              88            88
- *      88d8b.d8b. dP .d8888b. 88d888b. .d8888b. 88  .dP  dP d8888P
- *      88'`88'`88 88 88'  `"" 88'  `88 88'  `88 88888"   88   88
- *      88  88  88 88 88.  ... 88       88.  .88 88  `8b. 88   88
- *      dP  dP  dP dP `88888P' dP       `88888P' dP   `YP dP   dP
- *
- * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  * @file assert.h
- * @author Dominik Prause (dominik@inspirent.io)
+ * @author Dominik Prause
  * @version 0.1
  * @date 2025-04-17
  * @copyright Copyright (c) 2025 - All rights reserved.
@@ -18,56 +10,61 @@
 #ifndef MICROKIT_ASSERT_H
 #define MICROKIT_ASSERT_H
 
-#include "microkit/lib/contracts/platform/assert.h"
-#include "microkit/lib/types.h"
+#include "libs/microkit/lib/core.h"
+#include "libs/microkit/lib/platform/assert.h"
+#include "libs/microkit/lib/types.h"
+#include "microkit/config/microkit.h"
+
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_ASSERT)
 
 /**
  * @brief Asserts that the given expression is true.
  */
-#define ASSERT(expression)                                                     \
-   do {                                                                        \
-      if (!(expression)) {                                                     \
-         gpio_assertion();                                                     \
-      }                                                                        \
+#define ASSERT(expression) \
+   do {                    \
+      if (!(expression)) { \
+         gpio_assertion(); \
+      }                    \
    } while (0)
 
 /**
  * @brief Asserts that the given expression is true.
  */
-#define ASSERT_NOT(expression)                                                 \
-   do {                                                                        \
-      ASSERT(!(expression));                                                   \
+#define ASSERT_NOT(expression) \
+   do {                        \
+      ASSERT(!(expression));   \
    } while (0)
 
 /**
  * @brief Asserts that the given value is a null-pointer.
  * @param pointer The pointer to check.
  */
-#define ASSERT_NULL_POINTER(pointer)                                           \
-   do {                                                                        \
-      if ((pointer) != NULL) {                                                 \
-         gpio_assertion();                                                     \
-      }                                                                        \
+#define ASSERT_NULL_POINTER(pointer) \
+   do {                              \
+      if ((pointer) != NULL) {       \
+         gpio_assertion();           \
+      }                              \
    } while (0)
 
 /**
  * @brief Asserts that the given value is not a null-pointer.
  * @param pointer The pointer to check.
  */
-#define ASSERT_NOT_NULL_POINTER(pointer)                                       \
-   do {                                                                        \
-      if ((pointer) == NULL) {                                                 \
-         gpio_assertion();                                                     \
-      }                                                                        \
+#define ASSERT_NOT_NULL_POINTER(pointer) \
+   do {                                  \
+      if ((pointer) == NULL) {           \
+         gpio_assertion();               \
+      }                                  \
    } while (0)
 
 /**
  * @brief Raises assertion when this code line is reached.
  */
-#define ASSERT_NOT_REACHED                                                     \
-   do {                                                                        \
-      ASSERT(false);                                                           \
+#define ASSERT_NOT_REACHED \
+   do {                    \
+      ASSERT(false);       \
    } while (0)
 
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-#endif
+#endif // MICROKIT_CONFIG_USE_ASSERT
+
+#endif // MICROKIT_ASSERT_H

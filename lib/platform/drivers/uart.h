@@ -1,7 +1,16 @@
-#ifndef MKIT_UART_H
-#define MKIT_UART_H
+/**
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ * @file uart.h
+ * @author Dominik Prause
+ * @version 0.1
+ * @date 2025-04-17
+ * @copyright Copyright (c) 2025 - All rights reserved.
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#ifndef MICROKIT_UART_H
+#define MICROKIT_UART_H
 
-#include "microkit/lib/types.h"
+#include "libs/microkit/lib/types.h"
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 

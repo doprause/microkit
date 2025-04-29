@@ -6,8 +6,11 @@
 #ifndef MICROKIT_LOGGER_H
 #define MICROKIT_LOGGER_H
 
-#include "microkit/lib/config/logger.h"
-#include "microkit/lib/types.h"
+#include "libs/microkit/lib/core.h"
+#include "libs/microkit/lib/types.h"
+#include "microkit/config/logger.h"
+
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_LOGGER)
 
 /**
  * @brief Log levels.
@@ -59,4 +62,6 @@ typedef struct {
  */
 extern LoggerInterface Logger;
 
-#endif
+#endif // MICROKIT_CONFIG_USE_LOGGER
+
+#endif // MICROKIT_LOGGER_H

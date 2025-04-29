@@ -1,0 +1,15 @@
+/**
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ * Uncomment the following lines to enable the UARTs you need.
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#include "microkit.h"
+
+// #define MICROKIT_CONFIG_UART_USE_UART1
+// #define MICROKIT_CONFIG_UART_USE_UART2
+// #define MICROKIT_CONFIG_UART_USE_UART3
+// #define MICROKIT_CONFIG_UART_USE_UART4
+// #define MICROKIT_CONFIG_UART_USE_UART5
+// #define MICROKIT_CONFIG_UART_USE_UART6
+// #define MICROKIT_CONFIG_UART_USE_UART7
+// #define MICROKIT_CONFIG_UART_USE_UART8

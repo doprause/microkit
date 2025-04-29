@@ -1,9 +1,18 @@
-
-#include "microkit/lib/assert.h"
-#include "microkit/lib/config/mcu.h"
-#include "microkit/lib/config/os.h"
-#include "microkit/lib/contracts/platform/drivers/uart.h"
-#include "microkit/lib/contracts/platform/stdio.h"
+/**
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ * @file uart.c
+ * @author Dominik Prause
+ * @version 0.1
+ * @date 2025-04-17
+ * @copyright Copyright (c) 2025 - All rights reserved.
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#include "libs/microkit/lib/assert.h"
+#include "libs/microkit/lib/core.h"
+#include "libs/microkit/lib/platform/drivers/uart.h"
+#include "libs/microkit/lib/platform/stdio.h"
+#include "microkit/config/console.h"
+#include "microkit/config/uart.h"
 
 #include "stm32h5xx_hal.h"
 
@@ -27,18 +36,18 @@ struct UartDeviceObject {
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    👉 Configuration
    - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-#if CONFIG_MCU_USE_UART1
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_UART_USE_UART1)
 struct UartDeviceObject DEVICE_UART1 = {.state = MKIT_UART_STATE_CREATED,
                                         .mcu = {0}};
 #endif
 
-#if CONFIG_MCU_USE_UART2
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_UART_USE_UART2)
 struct UartDeviceObject DEVICE_UART2 = {.state = MKIT_UART_STATE_CREATED,
                                         .mcu = {0}};
 #endif
 
-#if defined(CONFIG_OS_CONSOLE_ENABLE) && defined(CONFIG_OS_CONSOLE_USE_UART1)
-#if defined(CONFIG_MCU_USE_UART1)
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_CONSOLE) && MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_CONSOLE_USE_UART1)
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_UART_USE_UART1)
 UartDevice DEVICE_CONSOLE = &DEVICE_UART1;
 #else
 #error \
@@ -46,8 +55,8 @@ UartDevice DEVICE_CONSOLE = &DEVICE_UART1;
 #endif
 #endif
 
-#if defined(CONFIG_OS_CONSOLE_ENABLE) && defined(CONFIG_OS_CONSOLE_USE_UART2)
-#if defined(CONFIG_MCU_USE_UART2)
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_CONSOLE) && MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_CONSOLE_USE_UART2)
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_UART_USE_UART2)
 const UartDevice DEVICE_CONSOLE = &DEVICE_UART2;
 #else
 #error \
@@ -68,7 +77,7 @@ static UInt uart_convert_parity_for_mcu(UartParity parity);
    - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 static void uart_init() {
 
-#if CONFIG_MCU_USE_UART1
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_UART_USE_UART1)
    DEVICE_UART1.mcu.Instance = USART1;
    DEVICE_UART1.mcu.Init.BaudRate = 115200;
    DEVICE_UART1.mcu.Init.WordLength = UART_WORDLENGTH_8B;
@@ -84,7 +93,7 @@ static void uart_init() {
    DEVICE_UART1.state = MKIT_UART_STATE_STOPPED;
 #endif
 
-#if CONFIG_MCU_USE_UART2
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_UART_USE_UART2)
    DEVICE_UART2.mcu.Instance = USART2;
    DEVICE_UART2.mcu.Init.BaudRate = 115200;
    DEVICE_UART2.mcu.Init.WordLength = UART_WORDLENGTH_8B;

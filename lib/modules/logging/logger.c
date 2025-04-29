@@ -1,10 +1,12 @@
-
+#include "libs/microkit/lib/core.h"
+#include "libs/microkit/lib/debug.h"
 #include "logger.h"
-#include "microkit/lib/debug.h"
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_LOGGER)
 
 #define FILE __FILE__
 #define LINE __LINE__
@@ -53,31 +55,35 @@ static const char* private_level_colors[] = {
 static void private_log(const LogLevel level, const char* file, int line, const char* message, va_list args) {
 
    char formatted_time[16];
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_LOGGER_USE_TIMESTAMPS)
    // time_t t = time(NULL);
    // formatted_time[strftime(formatted_time, sizeof(formatted_time), "%H:%M:%S", localtime(&t))] = '\0';
    // formatted_time[strftime(formatted_time, sizeof(formatted_time), "%H:%M:%S", time(NULL))] = '\0';
    strncpy(formatted_time, "--:--:--", sizeof(formatted_time));
+#else
+   strncpy(formatted_time, "", sizeof(formatted_time));
+#endif // MICROKIT_CONFIG_LOGGER_USE_TIMESTAMPS
 
    char formatted_message[64];
    formatted_message[vsnprintf(formatted_message, sizeof(formatted_message), message, args)] = '\0';
 
-#if MICROKIT_CONFIG_LOGGER_USE_SOURCE_LINES == TRUE
-#if MICROKIT_CONFIG_LOGGER_USE_COLORS
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_LOGGER_USE_SOURCE_LINES)
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_LOGGER_USE_COLORS)
    const char* format = "%s %s%-5s\033[0m \033[90m%s:%d\033[0m %s\n";
    debug_print(format, formatted_time, private_level_colors[level], private_level_strings[level], file, line, formatted_message);
 #else
    const char* format = "%s %-5s %s:%d %s\n";
    debug_print(format, formatted_time, private_level_strings[level], file, line, formatted_message);
-#endif
+#endif // MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_LOGGER_USE_COLORS)
 #else
-#if MICROKIT_CONFIG_LOGGER_USE_COLORS == TRUE
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_LOGGER_USE_COLORS)
    const char* format = "%s %s%-5s\033[0m %s\n";
    debug_print(format, formatted_time, private_level_colors[level], private_level_strings[level], formatted_message);
 #else
    const char* format = "%s %-5s %s\n";
    debug_print(format, formatted_time, private_level_strings[level], formatted_message);
-#endif
-#endif
+#endif // MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_LOGGER_USE_COLORS)
+#endif // MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_LOGGER_USE_SOURCE_LINES)
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -120,3 +126,5 @@ LoggerInterface Logger = {
     .getLevel = getLevel,
     .setLevel = setLevel,
 };
+
+#endif // MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_LOGGER)

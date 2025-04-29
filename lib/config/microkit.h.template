@@ -1,3 +1,18 @@
-#define MICROKIT_USE_I2C
-#define MICROKIT_USE_TIME
-#define MICROKIT_USE_UART
+/**
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ * Uncomment the following lines to enable the features you need.
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ *
+ * These settings specify the overall configuration of the Microkit library.
+ *
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#define MICROKIT_CONFIG_USE_ASSERT
+#define MICROKIT_CONFIG_USE_CONSOLE
+#define MICROKIT_CONFIG_USE_DEBUG_CONSOLE
+#define MICROKIT_CONFIG_USE_DEBUG_LED
+#define MICROKIT_CONFIG_USE_I2C
+#define MICROKIT_CONFIG_USE_LOGGER
+#define MICROKIT_CONFIG_USE_SHELL
+#define MICROKIT_CONFIG_USE_TIME
+#define MICROKIT_CONFIG_USE_UART

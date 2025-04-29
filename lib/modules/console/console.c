@@ -1,7 +1,10 @@
 
 #include "console.h"
-#include "microkit/lib/assert.h"
-#include "microkit/lib/contracts/platform/stdio.h"
+#include "libs/microkit/lib/assert.h"
+#include "libs/microkit/lib/core.h"
+#include "libs/microkit/lib/platform/stdio.h"
+
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_CONSOLE)
 
 typedef enum {
    MKIT_MODULE_STATE_UNINITIALIZED,
@@ -103,3 +106,5 @@ ConsoleInterface Console = {
     .write = write,
     .writeLine = write_line,
 };
+
+#endif // MICROKIT_CONFIG_USE_CONSOLE

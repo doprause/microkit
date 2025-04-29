@@ -1,8 +1,8 @@
-
-
-#include "microkit/lib/debug.h"
-#include "microkit/lib/config/os.h"
-#include "microkit/lib/modules/console/console.h"
+#include "libs/microkit/lib/core.h"
+#include "libs/microkit/lib/debug.h"
+#include "libs/microkit/lib/modules/console/console.h"
+#include "microkit/config/debug.h"
+#include "microkit/config/microkit.h"
 
 #include <stm32h533xx.h>
 #include <stm32h5xx_hal.h>
@@ -12,9 +12,24 @@
 #include <stdlib.h>
 #include <string.h>
 
-/**
- * @brief Enagages or disengages the debug LED.
- */
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_DEBUG_CONSOLE)
+
+void debug_print(const char* fmt, ...) {
+
+   char buffer[MICROKIT_CONFIG_DEBUG_PRINT_BUFFER_SIZE];
+
+   va_list args;
+   va_start(args, fmt);
+   vsnprintf(buffer, MICROKIT_CONFIG_DEBUG_PRINT_BUFFER_SIZE, fmt, args);
+   va_end(args);
+
+   Console.write(buffer);
+}
+
+#endif
+
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_DEBUG_LED)
+
 void debug_led(bool enable) {
 
    if (enable) {
@@ -24,19 +39,4 @@ void debug_led(bool enable) {
    }
 }
 
-#if defined(CONFIG_OS_CONSOLE_ENABLE)
-/**
- * @brief Prints the given string to the default debug output.
- */
-void debug_print(const char* fmt, ...) {
-
-   char buffer[CONFIG_OS_DEBUG_PRINT_BUFFER_SIZE];
-
-   va_list args;
-   va_start(args, fmt);
-   vsnprintf(buffer, CONFIG_OS_DEBUG_PRINT_BUFFER_SIZE, fmt, args);
-   va_end(args);
-
-   Console.write(buffer);
-}
 #endif

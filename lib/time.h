@@ -1,7 +1,8 @@
-#include "config/microkit.h"
-#include "microkit/lib/types.h"
+#include "libs/microkit/lib/core.h"
+#include "libs/microkit/lib/types.h"
+#include "microkit/config/microkit.h"
 
-#if defined(MICROKIT_USE_TIME)
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_TIME)
 
 typedef struct {
    /**
@@ -10,11 +11,11 @@ typedef struct {
     */
    void (*micros)(UInt32 micros);
 
-       /**
-        * @brief Busy wait for the specified number of milliseconds.
-        * @param millis Delay in milliseconds.
-        */
-       void (*millis)(UInt32 millis);
+   /**
+    * @brief Busy wait for the specified number of milliseconds.
+    * @param millis Delay in milliseconds.
+    */
+   void (*millis)(UInt32 millis);
 } MicrokitTimeDelayInterface;
 
 typedef struct {

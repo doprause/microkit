@@ -1,7 +1,7 @@
 #ifndef MICROKIT_I2C_H
 #define MICROKIT_I2C_H
 
-#include "microkit/lib/types.h"
+#include "libs/microkit/lib/types.h"
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    👉 I2C type definitions

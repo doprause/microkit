@@ -1,0 +1,14 @@
+/**
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ * Uncomment the following lines to enable the features you need.
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ *
+ * These settings specify the Logger features.
+ *
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#include "microkit.h"
+
+#define MICROKIT_CONFIG_LOGGER_USE_COLORS
+#define MICROKIT_CONFIG_LOGGER_USE_SOURCE_LINES
+#define MICROKIT_CONFIG_LOGGER_USE_TIMESTAMPS
