@@ -1,0 +1,3 @@
+#define MICROKIT_USE_I2C
+#define MICROKIT_USE_TIME
+#define MICROKIT_USE_UART
