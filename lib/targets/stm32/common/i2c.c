@@ -5,18 +5,11 @@
 #include "libs/microkit/lib/platform/drivers/i2c.h"
 #include "microkit/config/i2c.h"
 
-
 #include "stm32h5xx_hal.h"
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    👉 Types
    - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-typedef enum {
-   MKIT_I2C_STATE_CREATED,
-   MKIT_I2C_STATE_STOPPED,
-   MKIT_I2C_STATE_STARTED
-} I2cState;
-
 typedef struct {
    bool isRepeatedStart;
    bool memoryReadComplete;
@@ -46,7 +39,7 @@ typedef struct {
  * @brief I2C device.
  */
 struct I2cDeviceObject {
-   I2cState state;
+   DriverState state;
    I2cCallbacks callbacks;
    I2cMode mode;
    I2cStatus status;
@@ -58,32 +51,66 @@ struct I2cDeviceObject {
    👉 Configuration
    - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 #if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_I2C_USE_I2C1)
-struct I2cDeviceObject DEVICE_I2C1_INSTANCE = {.state = MKIT_I2C_STATE_CREATED,
-                                               .mcu = {0}};
+struct I2cDeviceObject DEVICE_I2C1_INSTANCE = {
+    .state = MKIT_DRIVER_STATE_UNINITIALIZED,
+    .mcu = {0},
+};
 I2cDevice DEVICE_I2C1 = &DEVICE_I2C1_INSTANCE;
 #endif // MICROKIT_CONFIG_I2C_USE_I2C1
 
 #if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_I2C_USE_I2C2)
-struct I2cDeviceObject DEVICE_I2C2_INSTANCE = {.state = MKIT_I2C_STATE_CREATED,
-                                               .mcu = {0}};
+struct I2cDeviceObject DEVICE_I2C2_INSTANCE = {
+    .state = MKIT_DRIVER_STATE_UNINITIALIZED,
+    .mcu = {0},
+};
 I2cDevice DEVICE_I2C2 = &DEVICE_I2C2_INSTANCE;
 #endif // MICROKIT_CONFIG_I2C_USE_I2C2
 
 #if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_I2C_USE_I2C3)
-struct I2cDeviceObject DEVICE_I2C3_INSTANCE = {.state = MKIT_I2C_STATE_CREATED,
-                                               .mcu = {0}};
+struct I2cDeviceObject DEVICE_I2C3_INSTANCE = {
+    .state = MKIT_DRIVER_STATE_UNINITIALIZED,
+    .mcu = {0},
+};
 I2cDevice DEVICE_I2C3 = &DEVICE_I2C3_INSTANCE;
 #endif // MICROKIT_CONFIG_I2C_USE_I2C3
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-   👉 Forward declarations
+   👉 Private functions
    - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-static inline void rearm_i2c_slave_mode(const I2cDevice device);
+static inline void rearm_i2c_slave_mode(const I2cDevice device) {
+
+   device->status.isRepeatedStart = false;
+
+   HAL_I2C_EnableListen_IT(&device->mcu);
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+static inline I2cDevice get_device_from_handle(I2C_HandleTypeDef* handle) {
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_I2C_USE_I2C1)
+   if (handle == &DEVICE_I2C1->mcu) {
+      return DEVICE_I2C1;
+   }
+#endif
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_I2C_USE_I2C2)
+   if (handle == &DEVICE_I2C2->mcu) {
+      return DEVICE_I2C2;
+   }
+#endif
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_I2C_USE_I2C3)
+   if (handle == &DEVICE_I2C3->mcu) {
+      return DEVICE_I2C3;
+   }
+#endif
+
+   ASSERT_NOT_REACHED;
+
+   return 0;
+}
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    👉 I2C lifecycle functions
    - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-static void init(void) {
+void microkit_i2c_init(void) {
 
 #if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_I2C_USE_I2C1)
    DEVICE_I2C1->mcu.Instance = I2C1;
@@ -96,7 +123,7 @@ static void init(void) {
    DEVICE_I2C1->mcu.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
    DEVICE_I2C1->mcu.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
 
-   DEVICE_I2C1->state = MKIT_I2C_STATE_STOPPED;
+   DEVICE_I2C1->state = MKIT_DRIVER_STATE_STOPPED;
 #endif
 
 #if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_I2C_USE_I2C2)
@@ -110,7 +137,7 @@ static void init(void) {
    DEVICE_I2C2->mcu.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
    DEVICE_I2C2->mcu.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
 
-   DEVICE_I2C2->state = MKIT_I2C_STATE_STOPPED;
+   DEVICE_I2C2->state = MKIT_DRIVER_STATE_STOPPED;
 #endif
 
 #if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_I2C_USE_I2C3)
@@ -124,12 +151,12 @@ static void init(void) {
    DEVICE_I2C3->mcu.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
    DEVICE_I2C3->mcu.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
 
-   DEVICE_I2C3->state = MKIT_I2C_STATE_STOPPED;
+   DEVICE_I2C3->state = MKIT_DRIVER_STATE_STOPPED;
 #endif
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-static void start(const I2cDevice device, I2cConfig config) {
+void microkit_i2c_start(const I2cDevice device, I2cConfig config) {
 
    ASSERT_NOT_NULL_POINTER(device);
 
@@ -180,11 +207,11 @@ static void start(const I2cDevice device, I2cConfig config) {
       rearm_i2c_slave_mode(device);
    }
 
-   device->state = MKIT_I2C_STATE_STARTED;
+   device->state = MKIT_DRIVER_STATE_RUNNING;
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-static void stop(const I2cDevice device) {
+void microkit_i2c_stop(const I2cDevice device) {
 
    ASSERT_NOT_NULL_POINTER(device);
 
@@ -194,10 +221,12 @@ static void stop(const I2cDevice device) {
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    👉 I2C master mode functions
    - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-static StatusOrNumber receive(const I2cDevice device, UInt8 deviceAddress,
-                              UInt8* data, Size dataSize, Bool async) {
+StatusOrNumber microkit_i2c_receive(
+    const I2cDevice device, UInt8 deviceAddress,
+    UInt8* data, Size dataSize, Bool async) {
 
    ASSERT_NOT_NULL_POINTER(device);
+   ASSERT(device->state == MKIT_DRIVER_STATE_RUNNING);
 
    if (HAL_I2C_GetState(&device->mcu) != HAL_I2C_STATE_READY) {
       return STATUS_ERROR;
@@ -222,10 +251,12 @@ static StatusOrNumber receive(const I2cDevice device, UInt8 deviceAddress,
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-static StatusOrNumber transmit(const I2cDevice device, const UInt8 deviceAddress,
-                               UInt8* data, Size dataSize, Bool async) {
+StatusOrNumber microkit_i2c_transmit(
+    const I2cDevice device, const UInt8 deviceAddress,
+    UInt8* data, Size dataSize, Bool async) {
 
    ASSERT_NOT_NULL_POINTER(device);
+   ASSERT(device->state == MKIT_DRIVER_STATE_RUNNING);
 
    if (HAL_I2C_GetState(&device->mcu) != HAL_I2C_STATE_READY) {
       return STATUS_ERROR;
@@ -252,11 +283,13 @@ static StatusOrNumber transmit(const I2cDevice device, const UInt8 deviceAddress
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    👉 I2C master mode memory read/write functions
    - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-static StatusOrNumber memoryRead(const I2cDevice device, const UInt8 deviceAddress,
-                                 const UInt16 memoryAddress, const UInt16 memoryAddressSize,
-                                 UInt8* data, const Size dataSize, const Bool async) {
+StatusOrNumber microkit_i2c_memory_read(
+    const I2cDevice device, const UInt8 deviceAddress,
+    const UInt16 memoryAddress, const UInt16 memoryAddressSize,
+    UInt8* data, const Size dataSize, const Bool async) {
 
    ASSERT_NOT_NULL_POINTER(device);
+   ASSERT(device->state == MKIT_DRIVER_STATE_RUNNING);
 
    if (HAL_I2C_GetState(&device->mcu) != HAL_I2C_STATE_READY) {
       return STATUS_ERROR;
@@ -268,23 +301,31 @@ static StatusOrNumber memoryRead(const I2cDevice device, const UInt8 deviceAddre
 
    device->status.memoryReadComplete = false;
 
-   HAL_StatusTypeDef status = HAL_I2C_Mem_Read_IT(&device->mcu, (UInt16)deviceAddress << 1, memoryAddress, memoryAddressSize, data, dataSize);
+   HAL_StatusTypeDef status = HAL_I2C_Mem_Read_IT(
+       &device->mcu, (UInt16)deviceAddress << 1,
+       memoryAddress,
+       memoryAddressSize,
+       data,
+       dataSize);
 
    // If we are not in async mode, we need to wait for the transfer to complete
    if (!async) {
-      while (!device->status.memoryReadComplete)
-         ;
+      while (!device->status.memoryReadComplete) {
+         // Wait for the transfer to complete
+      };
    }
 
    return status == HAL_OK ? (int)dataSize : STATUS_ERROR;
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-static StatusOrNumber memoryWrite(const I2cDevice device, const UInt8 deviceAddress,
-                                  const UInt16 memoryAddress, const UInt16 memoryAddressSize,
-                                  const UInt8* data, const Size dataSize, const Bool async) {
+StatusOrNumber microkit_i2c_memory_write(
+    const I2cDevice device, const UInt8 deviceAddress,
+    const UInt16 memoryAddress, const UInt16 memoryAddressSize,
+    const UInt8* data, const Size dataSize, const Bool async) {
 
    ASSERT_NOT_NULL_POINTER(device);
+   ASSERT(device->state == MKIT_DRIVER_STATE_RUNNING);
 
    if (device->status.memoryWriteComplete == false) {
       return STATUS_ERROR;
@@ -293,12 +334,19 @@ static StatusOrNumber memoryWrite(const I2cDevice device, const UInt8 deviceAddr
    device->status.memoryWriteComplete = false;
 
    HAL_StatusTypeDef status =
-       HAL_I2C_Mem_Write_IT(&device->mcu, (UInt16)deviceAddress << 1, memoryAddress, memoryAddressSize, (UInt8*)data, dataSize);
+       HAL_I2C_Mem_Write_IT(
+           &device->mcu,
+           (UInt16)deviceAddress << 1,
+           memoryAddress,
+           memoryAddressSize,
+           (UInt8*)data,
+           dataSize);
 
    // If we are not in async mode, we need to wait for the transfer to complete
    if (!async) {
-      while (!device->status.memoryWriteComplete)
-         ;
+      while (!device->status.memoryWriteComplete) {
+         // Wait for the transfer to complete
+      };
    }
 
    return status == HAL_OK ? (int)dataSize : STATUS_ERROR;
@@ -307,37 +355,6 @@ static StatusOrNumber memoryWrite(const I2cDevice device, const UInt8 deviceAddr
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    👉 Vendor specific code
    - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-static inline I2cDevice get_device_from_handle(I2C_HandleTypeDef* handle) {
-#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_I2C_USE_I2C1)
-   if (handle == &DEVICE_I2C1->mcu) {
-      return DEVICE_I2C1;
-   }
-#endif
-#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_I2C_USE_I2C2)
-   if (handle == &DEVICE_I2C2->mcu) {
-      return DEVICE_I2C2;
-   }
-#endif
-#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_I2C_USE_I2C3)
-   if (handle == &DEVICE_I2C3->mcu) {
-      return DEVICE_I2C3;
-   }
-#endif
-
-   ASSERT_NOT_REACHED;
-
-   return 0;
-}
-
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-static inline void rearm_i2c_slave_mode(const I2cDevice device) {
-
-   device->status.isRepeatedStart = false;
-
-   HAL_I2C_EnableListen_IT(&device->mcu);
-}
-
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 void HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef* handle) {
 
    // I2C master receive completed
@@ -402,7 +419,7 @@ void HAL_I2C_MemTxCpltCallback(I2C_HandleTypeDef* handle) {
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-#if defined(CONFIG_I2C_USE_SLAVE_MODE) // 👉 Slave mode code
+#if MICROKIT_IS_CONFIGURED(CONFIG_I2C_USE_SLAVE_MODE) // 👉 Slave mode code
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 void HAL_I2C_AddrCallback(I2C_HandleTypeDef* handle, uint8_t TransferDirection,
                           uint16_t AddrMatchCode) {
@@ -605,14 +622,3 @@ void I2C2_ER_IRQHandler(void) { HAL_I2C_ER_IRQHandler(&DEVICE_I2C2->mcu); }
 #if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_I2C_USE_I2C3)
 void I2C3_ER_IRQHandler(void) { HAL_I2C_ER_IRQHandler(&DEVICE_I2C3->mcu); }
 #endif
-
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-I2cInterface I2c = {
-    .init = init,
-    .start = start,
-    .stop = stop,
-    .receive = receive,
-    .transmit = transmit,
-    .memoryRead = memoryRead,
-    .memoryWrite = memoryWrite,
-};

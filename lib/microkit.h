@@ -3,16 +3,29 @@
 
 #include "libs/microkit/lib/console.h"
 #include "libs/microkit/lib/core.h"
+#include "libs/microkit/lib/i2c.h"
 #include "libs/microkit/lib/logger.h"
 #include "libs/microkit/lib/time.h"
 #include "libs/microkit/lib/uart.h"
 
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+   👉 Driver API
+   - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 typedef struct {
+
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_I2C)
+   MicrokitDriverI2cInterface i2c;
+#endif
+
 #if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_UART)
    MicrokitDriverUartInterface uart;
 #endif
+
 } MicrokitDriverInterface;
 
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+   👉 Microkit API
+   - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 typedef struct {
    void (*init)(void);
    void (*start)(void);

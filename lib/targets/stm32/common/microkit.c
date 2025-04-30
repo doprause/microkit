@@ -11,6 +11,7 @@
 #include "libs/microkit/lib/microkit.h"
 #include "libs/microkit/lib/modules/console/console.h"
 #include "libs/microkit/lib/modules/logger/logger.h"
+#include "libs/microkit/lib/platform/drivers/i2c.h"
 #include "libs/microkit/lib/platform/drivers/uart.h"
 #include "libs/microkit/lib/platform/time.h"
 
@@ -29,6 +30,18 @@ MicrokitInterface Microkit = {
     .stop = stop,
 
     .driver = {
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_I2C)
+        .i2c = {
+            .init = microkit_i2c_init,
+            .start = microkit_i2c_start,
+            .stop = microkit_i2c_stop,
+            .receive = microkit_i2c_receive,
+            .transmit = microkit_i2c_transmit,
+            .memoryRead = microkit_i2c_memory_read,
+            .memoryWrite = microkit_i2c_memory_write,
+        },
+#endif
+
 #if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_UART)
         .uart = {
             .init = microkit_uart_init,
