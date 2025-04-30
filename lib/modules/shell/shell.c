@@ -1,10 +1,9 @@
-#include "shell.h"
-
 #include "libs/microkit/lib/assert.h"
+#include "libs/microkit/lib/core.h"
 #include "libs/microkit/lib/microkit.h"
 #include "libs/microkit/lib/platform/stdio.h"
 #include "libs/microkit/lib/utils/termcolor.h"
-
+#include "shell.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -92,84 +91,7 @@ static void private_print(const ShellModule shell, const char* message) {
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-// static void onLoggerTimerElapsed(const SoftwareTimerInstance timer, void* target, uint32 time) {
-
-//    UNUSED_ARG(timer);
-//    UNUSED_ARG(time);
-
-//    ShellModule instance = (ShellModule)target;
-
-//    ASSERT_NOT_NULL_POINTER(instance);
-
-//    instance->loggerPending = true;
-// }
-
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-static void init(
-    const ShellModule instance,
-    //  const SoftwareTimerInstance softwareTimer,
-    const MicrokitUartDevice serial,
-    const char* prompt,
-    const char terminator
-    //  const SupervisorInstance supervisor,
-    //  const PowerSimulatorInstance powerSimulator
-) {
-
-   ASSERT_NOT_NULL_POINTER(instance);
-
-   instance->commands = COMMANDS;
-   instance->commandCount = COMMAND_COUNT;
-   instance->commandPending = false;
-   instance->loggers = LOGGERS;
-   instance->loggerActive = false;
-   instance->loggerCount = LOGGER_COUNT;
-   instance->loggerPending = false;
-   instance->loggerTimerId = 0;
-   instance->receiveBufferPointer = instance->receiveBuffer;
-   instance->serial = serial;
-   // instance->softwareTimer = softwareTimer;
-   // instance->supervisor = supervisor;
-   // instance->powerSimulator = powerSimulator;
-   // volatile int test = strcmp(prompt, "123");
-   instance->prompt = strcmp(prompt, "") != 0 ? prompt : COMMAND_PROMPT,
-   instance->terminator = terminator;
-}
-
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-static void stop(const ShellModule instance) {
-
-   ASSERT_NOT_NULL_POINTER(instance);
-
-   // SoftwareTimer.stop(instance->softwareTimer, instance->loggerTimerId);
-   Microkit.driver.uart.stop(instance->serial);
-}
-
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-static void start(const ShellModule instance) {
-
-   ASSERT_NOT_NULL_POINTER(instance);
-
-   MicrokitUartConfig config = {
-       .baudrate = MKIT_UART_BAUDRATE_115200,
-       .databits = MKIT_UART_DATABITS_8,
-       .stopbits = MKIT_UART_STOPBITS_1,
-       .parity = MKIT_UART_PARITY_NONE,
-   };
-
-   Microkit.driver.uart.start(instance->serial, config);
-
-   // instance->loggerTimerId = SoftwareTimer.start(
-   //     instance->softwareTimer,
-   //     onLoggerTimerElapsed,
-   //     instance,
-   //     1000,
-   //     TIMER_PERIODIC);
-
-   private_print(instance, instance->prompt);
-}
-
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-static void process_character(const ShellModule instance, Int32 character) {
+static void private_process_character(const ShellModule instance, Int32 character) {
 
    if (character < 0) {
       return;
@@ -218,7 +140,84 @@ static void process_character(const ShellModule instance, Int32 character) {
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-static void process(const ShellModule instance) {
+// static void onLoggerTimerElapsed(const SoftwareTimerInstance timer, void* target, uint32 time) {
+
+//    UNUSED_ARG(timer);
+//    UNUSED_ARG(time);
+
+//    ShellModule instance = (ShellModule)target;
+
+//    ASSERT_NOT_NULL_POINTER(instance);
+
+//    instance->loggerPending = true;
+// }
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+void microkit_shell_init(
+    const ShellModule instance,
+    //  const SoftwareTimerInstance softwareTimer,
+    const MicrokitUartDevice serial,
+    const char* prompt,
+    const char terminator
+    //  const SupervisorInstance supervisor,
+    //  const PowerSimulatorInstance powerSimulator
+) {
+
+   ASSERT_NOT_NULL_POINTER(instance);
+
+   instance->commands = COMMANDS;
+   instance->commandCount = COMMAND_COUNT;
+   instance->commandPending = false;
+   instance->loggers = LOGGERS;
+   instance->loggerActive = false;
+   instance->loggerCount = LOGGER_COUNT;
+   instance->loggerPending = false;
+   instance->loggerTimerId = 0;
+   instance->receiveBufferPointer = instance->receiveBuffer;
+   instance->serial = serial;
+   // instance->softwareTimer = softwareTimer;
+   // instance->supervisor = supervisor;
+   // instance->powerSimulator = powerSimulator;
+   // volatile int test = strcmp(prompt, "123");
+   instance->prompt = strcmp(prompt, "") != 0 ? prompt : COMMAND_PROMPT,
+   instance->terminator = terminator;
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+void microkit_shell_stop(const ShellModule instance) {
+
+   ASSERT_NOT_NULL_POINTER(instance);
+
+   // SoftwareTimer.stop(instance->softwareTimer, instance->loggerTimerId);
+   Microkit.driver.uart.stop(instance->serial);
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+void microkit_shell_start(const ShellModule instance) {
+
+   ASSERT_NOT_NULL_POINTER(instance);
+
+   MicrokitUartConfig config = {
+       .baudrate = MKIT_UART_BAUDRATE_115200,
+       .databits = MKIT_UART_DATABITS_8,
+       .stopbits = MKIT_UART_STOPBITS_1,
+       .parity = MKIT_UART_PARITY_NONE,
+   };
+
+   Microkit.driver.uart.start(instance->serial, config);
+
+   // instance->loggerTimerId = SoftwareTimer.start(
+   //     instance->softwareTimer,
+   //     onLoggerTimerElapsed,
+   //     instance,
+   //     1000,
+   //     TIMER_PERIODIC);
+
+   private_print(instance, instance->prompt);
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+void microkit_shell_process(const ShellModule instance) {
 
    ASSERT_NOT_NULL_POINTER(instance);
 
@@ -226,7 +225,7 @@ static void process(const ShellModule instance) {
    Status uartRxStatus = Microkit.driver.uart.receive(instance->serial, &character, 1);
 
    while (uartRxStatus == STATUS_OK && !instance->commandPending) {
-      process_character(instance, character);
+      private_process_character(instance, character);
       uartRxStatus = Microkit.driver.uart.receive(instance->serial, &character, 1);
    }
 
@@ -264,7 +263,7 @@ static void process(const ShellModule instance) {
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-void write(const ShellModule instance, const char* message) {
+void microkit_shell_write(const ShellModule instance, const char* message) {
 
    ASSERT_NOT_NULL_POINTER(instance);
 
@@ -286,14 +285,3 @@ void write(const ShellModule instance, const char* message) {
 
 //    return instance->supervisor;
 // }
-
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-const ShellInterface Shell = {
-    .init = init,
-    .start = start,
-    .stop = stop,
-    .process = process,
-    .write = write,
-    //  .powerSimulator = powerSimulator,
-    //  .supervisor = supervisor,
-};

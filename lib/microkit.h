@@ -5,6 +5,7 @@
 #include "libs/microkit/lib/core.h"
 #include "libs/microkit/lib/i2c.h"
 #include "libs/microkit/lib/logger.h"
+#include "libs/microkit/lib/shell.h"
 #include "libs/microkit/lib/time.h"
 #include "libs/microkit/lib/uart.h"
 
@@ -37,8 +38,12 @@ typedef struct {
    MicrokitConsoleInterface console;
 #endif
 
-#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_CONSOLE)
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_LOGGER)
    MicrokitLoggerInterface logger;
+#endif
+
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_SHELL)
+   MicrokitShellInterface shell;
 #endif
 
 #if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_TIME)
