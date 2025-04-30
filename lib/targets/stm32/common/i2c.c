@@ -1,7 +1,7 @@
 #include "libs/microkit/lib/assert.h"
 #include "libs/microkit/lib/core.h"
 #include "libs/microkit/lib/debug.h"
-#include "libs/microkit/lib/modules/logger/logger.h"
+#include "libs/microkit/lib/microkit.h"
 #include "libs/microkit/lib/platform/drivers/i2c.h"
 #include "microkit/config/i2c.h"
 
@@ -546,7 +546,7 @@ void HAL_I2C_ErrorCallback(I2C_HandleTypeDef* handle) {
       // callback because the listen complete handler is called which then calls
       // the slaveTransmissionStoppedHandler(device) callback
    } else {
-      Logger.log(MKIT_LOG_LEVEL_WARN, "UNHANDLED I2C ERROR [%d]", errorcode);
+      Microkit.logger.log(MKIT_LOG_LEVEL_WARN, "UNHANDLED I2C ERROR [%d]", errorcode);
    }
 
    if (device->mode == MKIT_I2C_MODE_MASTER) {
