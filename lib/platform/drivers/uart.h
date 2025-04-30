@@ -7,8 +7,8 @@
  * @copyright Copyright (c) 2025 - All rights reserved.
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
-#ifndef MICROKIT_DRIVERS_UART_H
-#define MICROKIT_DRIVERS_UART_H
+#ifndef MICROKIT_DRIVER_UART_H
+#define MICROKIT_DRIVER_UART_H
 
 #include "libs/microkit/lib/core.h"
 #include "libs/microkit/lib/uart.h"
@@ -23,4 +23,4 @@ int microkit_uart_receive(const UartDevice device, UInt8* data, const Size size)
 int microkit_uart_send(const UartDevice device, UInt8* data, const Size size);
 
 #endif // MICROKIT_CONFIG_USE_UART
-#endif // MICROKIT_DRIVERS_UART_H
+#endif // MICROKIT_DRIVER_UART_H
