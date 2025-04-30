@@ -49,7 +49,7 @@ struct UartDeviceObject DEVICE_UART2 = {.state = MKIT_UART_STATE_CREATED,
 
 #if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_CONSOLE) && MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_CONSOLE_USE_UART1)
 #if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_UART_USE_UART1)
-UartDevice DEVICE_CONSOLE = &DEVICE_UART1;
+MicrokitUartDevice DEVICE_CONSOLE = &DEVICE_UART1;
 #else
 #error \
     "To use USART1 for the console, configure CONFIG_MCU_USE_UART1 in config/mcu.h"
@@ -58,7 +58,7 @@ UartDevice DEVICE_CONSOLE = &DEVICE_UART1;
 
 #if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_CONSOLE) && MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_CONSOLE_USE_UART2)
 #if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_UART_USE_UART2)
-const UartDevice DEVICE_CONSOLE = &DEVICE_UART2;
+const MicrokitUartDevice DEVICE_CONSOLE = &DEVICE_UART2;
 #else
 #error \
     "To use USART2 for the console, configure CONFIG_MCU_USE_UART2 in config/mcu.h"
@@ -175,7 +175,7 @@ void microkit_uart_init() {
 #endif
 }
 
-void microkit_uart_start(const UartDevice device, UartConfig config) {
+void microkit_uart_start(const MicrokitUartDevice device, MicrokitUartConfig config) {
 
    ASSERT_NOT_NULL_POINTER(device);
 
@@ -204,7 +204,7 @@ void microkit_uart_start(const UartDevice device, UartConfig config) {
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-void microkit_uart_stop(const UartDevice device) {
+void microkit_uart_stop(const MicrokitUartDevice device) {
 
    ASSERT_NOT_NULL_POINTER(device);
 
@@ -214,7 +214,7 @@ void microkit_uart_stop(const UartDevice device) {
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-int microkit_uart_receive(const UartDevice device, UInt8* data, const Size size) {
+int microkit_uart_receive(const MicrokitUartDevice device, UInt8* data, const Size size) {
 
    ASSERT_NOT_NULL_POINTER(device);
    ASSERT(device->state == MKIT_UART_STATE_STARTED);
@@ -225,7 +225,7 @@ int microkit_uart_receive(const UartDevice device, UInt8* data, const Size size)
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-int microkit_uart_send(const UartDevice device, UInt8* data, const Size size) {
+int microkit_uart_send(const MicrokitUartDevice device, UInt8* data, const Size size) {
 
    ASSERT_NOT_NULL_POINTER(device);
    ASSERT(device->state == MKIT_UART_STATE_STARTED);

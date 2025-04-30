@@ -107,7 +107,7 @@ typedef struct {
     */
    void (*init)(
        const ShellModule shell,
-       const UartDevice serial,
+       const MicrokitUartDevice serial,
        const char* prompt,
        const char terminator);
    // ShellModule (*init)(

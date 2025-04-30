@@ -62,12 +62,12 @@ typedef struct {
    const UartDataBits databits;
    const UartStopBits stopbits;
    const UartParity parity;
-} UartConfig;
+} MicrokitUartConfig;
 
 /**
  * @brief UART device pointer.
  */
-typedef struct UartDeviceObject* UartDevice;
+typedef struct UartDeviceObject* MicrokitUartDevice;
 
 /**
  * @brief The UART driver interface.
@@ -85,13 +85,13 @@ typedef struct {
     * @param device The device.
     * @param config The config.
     */
-   void (*start)(const UartDevice device, UartConfig config);
+   void (*start)(const MicrokitUartDevice device, MicrokitUartConfig config);
 
    /**
     * @brief Stops and de-initializes the given UART device.
     * @param device The device.
     */
-   void (*stop)(const UartDevice device);
+   void (*stop)(const MicrokitUartDevice device);
 
    /**
     * @brief Sends the given data over the UART device.
@@ -100,7 +100,7 @@ typedef struct {
     * @param length The length of the data to be sent.
     * @return The number of bytes sent.
     */
-   Int (*send)(const UartDevice device, UInt8* data, Size length);
+   Int (*send)(const MicrokitUartDevice device, UInt8* data, Size length);
 
    /**
     * @brief Receives up to maxLength bytes from the UART device.
@@ -109,7 +109,7 @@ typedef struct {
     * @param maxLength The maximum number of bytes to receive.
     * @return The number of bytes actually received.
     */
-   Int (*receive)(const UartDevice device, UInt8* data, Size maxLength);
+   Int (*receive)(const MicrokitUartDevice device, UInt8* data, Size maxLength);
 
 } MicrokitDriverUartInterface;
 

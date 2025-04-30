@@ -2,8 +2,8 @@
 
 #include "libs/microkit/lib/assert.h"
 #include "libs/microkit/lib/microkit.h"
-#include "libs/microkit/lib/utils/termcolor.h"
 #include "libs/microkit/lib/platform/stdio.h"
+#include "libs/microkit/lib/utils/termcolor.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -35,7 +35,7 @@ struct ShellObject {
    char receiveBuffer[CLI_MAX_BUFFER_SIZE];
    char* receiveBufferPointer;
    // PowerSimulatorInstance powerSimulator;
-   UartDevice serial;
+   MicrokitUartDevice serial;
    // SupervisorInstance supervisor;
    // SoftwareTimerInstance softwareTimer;
    const char* prompt;
@@ -76,7 +76,6 @@ static Status private_interpret(const ShellModule instance) {
    return STATUS_ERROR_UNKNOWN_COMMAND;
 }
 
-
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 static void private_print(const ShellModule shell, const char* message) {
 
@@ -109,7 +108,7 @@ static void private_print(const ShellModule shell, const char* message) {
 static void init(
     const ShellModule instance,
     //  const SoftwareTimerInstance softwareTimer,
-    const UartDevice serial,
+    const MicrokitUartDevice serial,
     const char* prompt,
     const char terminator
     //  const SupervisorInstance supervisor,
@@ -150,7 +149,7 @@ static void start(const ShellModule instance) {
 
    ASSERT_NOT_NULL_POINTER(instance);
 
-   UartConfig config = {
+   MicrokitUartConfig config = {
        .baudrate = MKIT_UART_BAUDRATE_115200,
        .databits = MKIT_UART_DATABITS_8,
        .stopbits = MKIT_UART_STOPBITS_1,
