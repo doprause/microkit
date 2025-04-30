@@ -204,5 +204,4 @@ typedef struct {
 } MicrokitDriverI2cInterface;
 
 #endif // MICROKIT_CONFIG_USE_I2C
-
 #endif // MICROKIT_I2C_H
