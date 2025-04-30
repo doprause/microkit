@@ -21,7 +21,7 @@ static struct Private private = {
 };
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-static void init(void) {
+void microkit_console_init(void) {
 
    ASSERT(private.moduleState == MKIT_MODULE_STATE_UNINITIALIZED);
 
@@ -29,7 +29,7 @@ static void init(void) {
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-static void start(void) {
+void microkit_console_start(void) {
 
    ASSERT(private.moduleState != MKIT_MODULE_STATE_UNINITIALIZED);
 
@@ -39,7 +39,7 @@ static void start(void) {
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-static void stop(void) {
+void microkit_console_stop(void) {
 
    ASSERT(private.moduleState != MKIT_MODULE_STATE_UNINITIALIZED);
 
@@ -49,7 +49,7 @@ static void stop(void) {
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-static int read(char* message, int length) {
+int microkit_console_read(char* message, int length) {
 
    ASSERT(private.moduleState == MKIT_MODULE_STATE_RUNNING);
 
@@ -74,7 +74,7 @@ static int read(char* message, int length) {
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-static void write(const char* message) {
+void microkit_console_write(const char* message) {
 
    ASSERT(private.moduleState == MKIT_MODULE_STATE_RUNNING);
 
@@ -89,22 +89,12 @@ static void write(const char* message) {
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-static void write_line(const char* message) {
+void microkit_console_write_line(const char* message) {
 
    ASSERT(private.moduleState == MKIT_MODULE_STATE_RUNNING);
 
-   write(message);
-   write("\n");
+   microkit_console_write(message);
+   microkit_console_write("\n");
 }
-
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-ConsoleInterface Console = {
-    .init = init,
-    .start = start,
-    .stop = stop,
-    .read = read,
-    .write = write,
-    .writeLine = write_line,
-};
 
 #endif // MICROKIT_CONFIG_USE_CONSOLE

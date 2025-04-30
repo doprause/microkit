@@ -1,3 +1,6 @@
+#ifndef MICROKIT_TIME_H
+#define MICROKIT_TIME_H
+
 #include "libs/microkit/lib/core.h"
 #include "libs/microkit/lib/types.h"
 #include "microkit/config/microkit.h"
@@ -22,4 +25,6 @@ typedef struct {
    const MicrokitTimeDelayInterface delay;
 } MicrokitTimeInterface;
 
-#endif
+#endif // MICROKIT_CONFIG_USE_TIME
+
+#endif // MICROKIT_TIME_H

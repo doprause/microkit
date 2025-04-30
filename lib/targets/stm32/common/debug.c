@@ -1,8 +1,8 @@
 #include "libs/microkit/lib/core.h"
 #include "libs/microkit/lib/debug.h"
-#include "libs/microkit/lib/modules/console/console.h"
 #include "microkit/config/debug.h"
 #include "microkit/config/microkit.h"
+#include "libs/microkit/lib/microkit.h"
 
 #include <stm32h533xx.h>
 #include <stm32h5xx_hal.h>
@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_DEBUG_CONSOLE)
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_CONSOLE) && MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_DEBUG_CONSOLE)
 
 void debug_print(const char* fmt, ...) {
 
@@ -23,7 +23,7 @@ void debug_print(const char* fmt, ...) {
    vsnprintf(buffer, MICROKIT_CONFIG_DEBUG_PRINT_BUFFER_SIZE, fmt, args);
    va_end(args);
 
-   Console.write(buffer);
+   Microkit.console.write(buffer);
 }
 
 #endif
