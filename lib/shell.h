@@ -19,7 +19,7 @@
 #define CLI_MAX_RESPONSE_LENGTH 256
 #endif
 
-typedef struct ShellObject* ShellModule;
+typedef struct MicrokitShellObject* ShellModule;
 
 /**
  * @brief Macro to define a command.

@@ -11,6 +11,7 @@
 #include "libs/microkit/lib/microkit.h"
 #include "libs/microkit/lib/modules/console/console.h"
 #include "libs/microkit/lib/modules/logger/logger.h"
+#include "libs/microkit/lib/modules/shell/shell.h"
 #include "libs/microkit/lib/platform/drivers/i2c.h"
 #include "libs/microkit/lib/platform/drivers/uart.h"
 #include "libs/microkit/lib/platform/time.h"
@@ -54,7 +55,14 @@ MicrokitInterface Microkit = {
     },
 
 #if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_CONSOLE)
-    .console = {.init = microkit_console_init, .start = microkit_console_start, .stop = microkit_console_stop, .read = microkit_console_read, .write = microkit_console_write, .writeLine = microkit_console_write_line},
+    .console = {
+        .init = microkit_console_init,
+        .start = microkit_console_start,
+        .stop = microkit_console_stop,
+        .read = microkit_console_read,
+        .write = microkit_console_write,
+        .writeLine = microkit_console_write_line,
+    },
 #endif
 
 #if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_LOGGER)
@@ -65,6 +73,16 @@ MicrokitInterface Microkit = {
         .log = microkit_logger_log,
         .getLevel = microkit_logger_get_level,
         .setLevel = microkit_logger_set_level,
+    },
+#endif
+
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_CONSOLE)
+    .shell = {
+        .init = microkit_shell_init,
+        .start = microkit_shell_start,
+        .stop = microkit_shell_stop,
+        .process = microkit_shell_process,
+        .write = microkit_shell_write,
     },
 #endif
 

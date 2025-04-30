@@ -20,7 +20,8 @@ static const char* COMMAND_FAILED = colorize("\nCommand failed\n", TERMCOLOR_RED
 static const char* COMMAND_UNKNOWN = colorize("\nCommand unknown\n", TERMCOLOR_YELLOW); // "\x1b[36mCommand unknown\x1b[0m\r\n";
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-struct ShellObject {
+struct MicrokitShellObject {
+   ModuleState moduleState;
    ShellCommand* commands;
    Size commandCount;
    bool commandPending;
@@ -42,7 +43,9 @@ struct ShellObject {
 };
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-struct ShellObject SHELL_OBJECT;
+struct MicrokitShellObject SHELL_OBJECT = {
+    .moduleState = MKIT_MODULE_STATE_UNINITIALIZED,
+};
 const ShellModule SHELL = &SHELL_OBJECT;
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -164,6 +167,7 @@ void microkit_shell_init(
 ) {
 
    ASSERT_NOT_NULL_POINTER(instance);
+   ASSERT(instance->moduleState == MKIT_MODULE_STATE_UNINITIALIZED);
 
    instance->commands = COMMANDS;
    instance->commandCount = COMMAND_COUNT;
@@ -181,21 +185,15 @@ void microkit_shell_init(
    // volatile int test = strcmp(prompt, "123");
    instance->prompt = strcmp(prompt, "") != 0 ? prompt : COMMAND_PROMPT,
    instance->terminator = terminator;
-}
 
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-void microkit_shell_stop(const ShellModule instance) {
-
-   ASSERT_NOT_NULL_POINTER(instance);
-
-   // SoftwareTimer.stop(instance->softwareTimer, instance->loggerTimerId);
-   Microkit.driver.uart.stop(instance->serial);
+   instance->moduleState = MKIT_MODULE_STATE_STOPPED;
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 void microkit_shell_start(const ShellModule instance) {
 
    ASSERT_NOT_NULL_POINTER(instance);
+   ASSERT(instance->moduleState != MKIT_MODULE_STATE_UNINITIALIZED);
 
    MicrokitUartConfig config = {
        .baudrate = MKIT_UART_BAUDRATE_115200,
@@ -213,13 +211,28 @@ void microkit_shell_start(const ShellModule instance) {
    //     1000,
    //     TIMER_PERIODIC);
 
+   instance->moduleState = MKIT_MODULE_STATE_RUNNING;
+
    private_print(instance, instance->prompt);
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+void microkit_shell_stop(const ShellModule instance) {
+
+   ASSERT_NOT_NULL_POINTER(instance);
+   ASSERT(instance->moduleState != MKIT_MODULE_STATE_UNINITIALIZED);
+
+   // SoftwareTimer.stop(instance->softwareTimer, instance->loggerTimerId);
+   Microkit.driver.uart.stop(instance->serial);
+
+   instance->moduleState = MKIT_MODULE_STATE_STOPPED;
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 void microkit_shell_process(const ShellModule instance) {
 
    ASSERT_NOT_NULL_POINTER(instance);
+   ASSERT(instance->moduleState == MKIT_MODULE_STATE_RUNNING);
 
    UInt8 character;
    Status uartRxStatus = Microkit.driver.uart.receive(instance->serial, &character, 1);
@@ -266,6 +279,7 @@ void microkit_shell_process(const ShellModule instance) {
 void microkit_shell_write(const ShellModule instance, const char* message) {
 
    ASSERT_NOT_NULL_POINTER(instance);
+   ASSERT(instance->moduleState == MKIT_MODULE_STATE_RUNNING);
 
    private_print(instance, message);
 }
