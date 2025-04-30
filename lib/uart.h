@@ -11,7 +11,6 @@
 #define MICROKIT_UART_H
 
 #include "libs/microkit/lib/core.h"
-// #include "libs/microkit/lib/platform/drivers/uart.h"
 #include "libs/microkit/lib/types.h"
 #include "microkit/config/uart.h"
 

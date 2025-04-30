@@ -23,5 +23,4 @@ int microkit_uart_receive(const UartDevice device, UInt8* data, const Size size)
 int microkit_uart_send(const UartDevice device, UInt8* data, const Size size);
 
 #endif // MICROKIT_CONFIG_USE_UART
-
 #endif // MICROKIT_DRIVERS_UART_H
