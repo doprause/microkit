@@ -23,7 +23,7 @@ typedef enum {
    MKIT_LOG_LEVEL_ERROR,
    MKIT_LOG_LEVEL_FATAL,
    MKIT_LOG_LEVEL_FORCE
-} LogLevel;
+} MicrokitLogLevel;
 
 /**
  * @brief The logger interface.
@@ -36,31 +36,36 @@ typedef struct {
    void (*init)(void);
 
    /**
+    * @brief Starts the logger.
+    */
+   void (*start)(void);
+
+   /**
+    * @brief Stops the logger.
+    */
+   void (*stop)(void);
+
+   /**
     * @brief Logs a message with the given level.
     * @param [in] level The log level.
     * @param [in] message The printf formatted message to be logged.
     * @param  [in] ... The arguments for the message.
     */
-   void (*log)(const LogLevel level, String message, ...);
+   void (*log)(const MicrokitLogLevel level, String message, ...);
 
    /**
     * @brief Gets the current log level.
     * @returns The current log level.
     */
-   LogLevel (*getLevel)(void);
+   MicrokitLogLevel (*getLevel)(void);
 
    /**
     * @brief Sets the log level.
     * @param [in] level The log level to be set.
     */
-   void (*setLevel)(const LogLevel level);
+   void (*setLevel)(const MicrokitLogLevel level);
 
-} LoggerInterface;
-
-/**
- * @brief The singleton logger instance.
- */
-extern LoggerInterface Logger;
+} MicrokitLoggerInterface;
 
 #endif // MICROKIT_CONFIG_USE_LOGGER
 

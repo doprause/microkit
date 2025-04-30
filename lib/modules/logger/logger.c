@@ -1,5 +1,7 @@
+#include "libs/microkit/lib/assert.h"
 #include "libs/microkit/lib/core.h"
 #include "libs/microkit/lib/debug.h"
+#include "libs/microkit/lib/logger.h"
 #include "logger.h"
 #include <stdarg.h>
 #include <stdio.h>
@@ -33,11 +35,13 @@ typedef struct {
 } LogEvent;
 
 typedef struct {
+   ModuleState moduleState;
    const char* format;
-   LogLevel level;
+   MicrokitLogLevel level;
 } Private;
 
-Private private = {
+static Private private = {
+    .moduleState = MKIT_MODULE_STATE_UNINITIALIZED,
     .format = "",
     .level = MKIT_LOG_LEVEL_TRACE,
 };
@@ -52,7 +56,7 @@ static const char* private_level_colors[] = {
 #endif
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-static void private_log(const LogLevel level, const char* file, int line, const char* message, va_list args) {
+static void private_log(const MicrokitLogLevel level, const char* file, int line, const char* message, va_list args) {
 
    char formatted_time[16];
 #if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_LOGGER_USE_TIMESTAMPS)
@@ -87,12 +91,35 @@ static void private_log(const LogLevel level, const char* file, int line, const 
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-static void init(void) {
-   // Nothing to do
+void microkit_logger_init(void) {
+
+   ASSERT(private.moduleState == MKIT_MODULE_STATE_UNINITIALIZED);
+
+   private.moduleState = MKIT_MODULE_STATE_STOPPED;
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-static void write(const LogLevel level, const char* message, ...) {
+void microkit_logger_start(void) {
+
+   ASSERT(private.moduleState != MKIT_MODULE_STATE_UNINITIALIZED);
+
+   if (private.moduleState == MKIT_MODULE_STATE_STOPPED) {
+      private.moduleState = MKIT_MODULE_STATE_RUNNING;
+   }
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+void microkit_logger_stop(void) {
+
+   ASSERT(private.moduleState != MKIT_MODULE_STATE_UNINITIALIZED);
+
+   if (private.moduleState == MKIT_MODULE_STATE_RUNNING) {
+      private.moduleState = MKIT_MODULE_STATE_STOPPED;
+   }
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+void microkit_logger_log(const MicrokitLogLevel level, const char* message, ...) {
 
    if (level < private.level) {
       return;
@@ -107,12 +134,12 @@ static void write(const LogLevel level, const char* message, ...) {
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-static LogLevel getLevel(void) {
+MicrokitLogLevel microkit_logger_get_level(void) {
    return private.level;
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-static void setLevel(const LogLevel level) {
+void microkit_logger_set_level(const MicrokitLogLevel level) {
 
    if (level >= MKIT_LOG_LEVEL_TRACE && level <= MKIT_LOG_LEVEL_FATAL) {
       private.level = level;
@@ -120,11 +147,11 @@ static void setLevel(const LogLevel level) {
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-LoggerInterface Logger = {
-    .init = init,
-    .log = write,
-    .getLevel = getLevel,
-    .setLevel = setLevel,
-};
+// LoggerInterface Logger = {
+//     .init = init,
+//     .log = write,
+//     .getLevel = get_level,
+//     .setLevel = set_level,
+// };
 
 #endif // MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_LOGGER)

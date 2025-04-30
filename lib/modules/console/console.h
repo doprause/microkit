@@ -22,7 +22,7 @@
 #include "libs/microkit/lib/types.h"
 #include "microkit/config/console.h"
 
-// #if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_CONSOLE)
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_CONSOLE)
 
 void microkit_console_init(void);
 void microkit_console_start(void);
@@ -31,6 +31,6 @@ int microkit_console_read(char* message, int maxLength);
 void microkit_console_write(const char* message);
 void microkit_console_write_line(const char* message);
 
-// #endif // MICROKIT_CONFIG_USE_CONSOLE
+#endif // MICROKIT_CONFIG_USE_CONSOLE
 
 #endif // MICROKIT_MODULES_CONSOLE_H

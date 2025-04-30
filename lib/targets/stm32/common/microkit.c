@@ -10,6 +10,7 @@
 #include "libs/microkit/lib/core.h"
 #include "libs/microkit/lib/microkit.h"
 #include "libs/microkit/lib/modules/console/console.h"
+#include "libs/microkit/lib/modules/logger/logger.h"
 #include "libs/microkit/lib/platform/time.h"
 
 static void init(void) {
@@ -34,6 +35,17 @@ MicrokitInterface Microkit = {
         .read = microkit_console_read,
         .write = microkit_console_write,
         .writeLine = microkit_console_write_line},
+#endif
+
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_LOGGER)
+    .logger = {
+        .init = microkit_logger_init,
+        .start = microkit_logger_start,
+        .stop = microkit_logger_stop,
+        .log = microkit_logger_log,
+        .getLevel = microkit_logger_get_level,
+        .setLevel = microkit_logger_set_level,
+    },
 #endif
 
 #if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_TIME)

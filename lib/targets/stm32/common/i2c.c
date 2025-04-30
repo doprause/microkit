@@ -1,7 +1,7 @@
 #include "libs/microkit/lib/assert.h"
 #include "libs/microkit/lib/core.h"
 #include "libs/microkit/lib/debug.h"
-#include "libs/microkit/lib/modules/logging/logger.h"
+#include "libs/microkit/lib/modules/logger/logger.h"
 #include "libs/microkit/lib/platform/drivers/i2c.h"
 #include "microkit/config/i2c.h"
 

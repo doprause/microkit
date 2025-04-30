@@ -3,6 +3,7 @@
 
 #include "libs/microkit/lib/console.h"
 #include "libs/microkit/lib/core.h"
+#include "libs/microkit/lib/logger.h"
 #include "libs/microkit/lib/time.h"
 
 
@@ -13,6 +14,10 @@ typedef struct {
 
 #if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_CONSOLE)
    MicrokitConsoleInterface console;
+#endif
+
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_CONSOLE)
+   MicrokitLoggerInterface logger;
 #endif
 
 #if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_TIME)
