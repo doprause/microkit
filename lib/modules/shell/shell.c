@@ -1,6 +1,7 @@
 #include "shell.h"
 
 #include "libs/microkit/lib/assert.h"
+#include "libs/microkit/lib/microkit.h"
 #include "libs/microkit/lib/utils/termcolor.h"
 #include "libs/microkit/lib/platform/stdio.h"
 
@@ -141,7 +142,7 @@ static void stop(const ShellModule instance) {
    ASSERT_NOT_NULL_POINTER(instance);
 
    // SoftwareTimer.stop(instance->softwareTimer, instance->loggerTimerId);
-   Uart.stop(instance->serial);
+   Microkit.driver.uart.stop(instance->serial);
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -156,7 +157,7 @@ static void start(const ShellModule instance) {
        .parity = MKIT_UART_PARITY_NONE,
    };
 
-   Uart.start(instance->serial, config);
+   Microkit.driver.uart.start(instance->serial, config);
 
    // instance->loggerTimerId = SoftwareTimer.start(
    //     instance->softwareTimer,
@@ -186,7 +187,7 @@ static void process_character(const ShellModule instance, Int32 character) {
 
       // Flush input buffer
       UInt8 character;
-      while (0 != Uart.receive(instance->serial, &character, 1)) {
+      while (0 != Microkit.driver.uart.receive(instance->serial, &character, 1)) {
          // Do nothing
       };
    }
@@ -223,11 +224,11 @@ static void process(const ShellModule instance) {
    ASSERT_NOT_NULL_POINTER(instance);
 
    UInt8 character;
-   Status uartRxStatus = Uart.receive(instance->serial, &character, 1);
+   Status uartRxStatus = Microkit.driver.uart.receive(instance->serial, &character, 1);
 
    while (uartRxStatus == STATUS_OK && !instance->commandPending) {
       process_character(instance, character);
-      uartRxStatus = Uart.receive(instance->serial, &character, 1);
+      uartRxStatus = Microkit.driver.uart.receive(instance->serial, &character, 1);
    }
 
    // Process the next command, if any

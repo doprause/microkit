@@ -11,6 +11,7 @@
 #include "libs/microkit/lib/core.h"
 #include "libs/microkit/lib/platform/drivers/uart.h"
 #include "libs/microkit/lib/platform/stdio.h"
+#include "libs/microkit/lib/uart.h"
 #include "microkit/config/console.h"
 #include "microkit/config/uart.h"
 
@@ -67,15 +68,79 @@ const UartDevice DEVICE_CONSOLE = &DEVICE_UART2;
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    👉 Forward declarations
    - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-static UInt uart_convert_baudrate_for_mcu(UartBaudRate baudrate);
-static UInt uart_convert_databits_for_mcu(UartDataBits databits);
-static UInt uart_convert_stopbits_for_mcu(UartStopBits stopbits);
-static UInt uart_convert_parity_for_mcu(UartParity parity);
+static UInt private_uart_convert_baudrate_for_mcu(UartBaudRate baudrate);
+static UInt private_uart_convert_databits_for_mcu(UartDataBits databits);
+static UInt private_uart_convert_stopbits_for_mcu(UartStopBits stopbits);
+static UInt private_uart_convert_parity_for_mcu(UartParity parity);
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+   👉 Private functions
+   - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+static UInt private_uart_convert_baudrate_for_mcu(UartBaudRate baudrate) {
+
+   switch (baudrate) {
+   case MKIT_UART_BAUDRATE_9600:
+      return 9600;
+   case MKIT_UART_BAUDRATE_19200:
+      return 19200;
+   case MKIT_UART_BAUDRATE_38400:
+      return 38400;
+   case MKIT_UART_BAUDRATE_115200:
+      return 115200;
+   case MKIT_UART_BAUDRATE_230400:
+      return 230400;
+   case MKIT_UART_BAUDRATE_460800:
+      return 460800;
+   case MKIT_UART_BAUDRATE_921600:
+      return 921600;
+   default:
+      return 115200;
+   }
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+static UInt private_uart_convert_databits_for_mcu(UartDataBits databits) {
+
+   switch (databits) {
+   case MKIT_UART_DATABITS_8:
+      return UART_WORDLENGTH_8B;
+   default:
+      return UART_WORDLENGTH_8B;
+   }
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+static UInt private_uart_convert_stopbits_for_mcu(UartStopBits stopbits) {
+
+   switch (stopbits) {
+   case MKIT_UART_STOPBITS_1:
+      return UART_STOPBITS_1;
+   case MKIT_UART_STOPBITS_2:
+      return UART_STOPBITS_2;
+   default:
+      return UART_STOPBITS_1;
+   }
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+static UInt private_uart_convert_parity_for_mcu(UartParity parity) {
+
+   switch (parity) {
+   case MKIT_UART_PARITY_NONE:
+      return UART_PARITY_NONE;
+   case MKIT_UART_PARITY_EVEN:
+      return UART_PARITY_EVEN;
+   case MKIT_UART_PARITY_ODD:
+      return UART_PARITY_ODD;
+   default:
+      return UART_PARITY_NONE;
+   }
+}
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    👉 UART interface implementation
    - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-static void uart_init() {
+void microkit_uart_init() {
 
 #if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_UART_USE_UART1)
    DEVICE_UART1.mcu.Instance = USART1;
@@ -110,15 +175,14 @@ static void uart_init() {
 #endif
 }
 
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-static void uart_start(const UartDevice device, UartConfig config) {
+void microkit_uart_start(const UartDevice device, UartConfig config) {
 
    ASSERT_NOT_NULL_POINTER(device);
 
-   device->mcu.Init.BaudRate = uart_convert_baudrate_for_mcu(config.baudrate);
-   device->mcu.Init.WordLength = uart_convert_databits_for_mcu(config.databits);
-   device->mcu.Init.StopBits = uart_convert_stopbits_for_mcu(config.stopbits);
-   device->mcu.Init.Parity = uart_convert_parity_for_mcu(config.parity);
+   device->mcu.Init.BaudRate = private_uart_convert_baudrate_for_mcu(config.baudrate);
+   device->mcu.Init.WordLength = private_uart_convert_databits_for_mcu(config.databits);
+   device->mcu.Init.StopBits = private_uart_convert_stopbits_for_mcu(config.stopbits);
+   device->mcu.Init.Parity = private_uart_convert_parity_for_mcu(config.parity);
 
    bool ok = false;
 
@@ -140,7 +204,7 @@ static void uart_start(const UartDevice device, UartConfig config) {
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-static void uart_stop(const UartDevice device) {
+void microkit_uart_stop(const UartDevice device) {
 
    ASSERT_NOT_NULL_POINTER(device);
 
@@ -150,7 +214,7 @@ static void uart_stop(const UartDevice device) {
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-static int uart_receive(const UartDevice device, UInt8* data, const Size size) {
+int microkit_uart_receive(const UartDevice device, UInt8* data, const Size size) {
 
    ASSERT_NOT_NULL_POINTER(device);
    ASSERT(device->state == MKIT_UART_STATE_STARTED);
@@ -161,7 +225,7 @@ static int uart_receive(const UartDevice device, UInt8* data, const Size size) {
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-static int uart_send(const UartDevice device, UInt8* data, const Size size) {
+int microkit_uart_send(const UartDevice device, UInt8* data, const Size size) {
 
    ASSERT_NOT_NULL_POINTER(device);
    ASSERT(device->state == MKIT_UART_STATE_STARTED);
@@ -191,76 +255,3 @@ void mkit_platform_stdio_put(int c) {
 
    HAL_UART_Transmit(&DEVICE_CONSOLE->mcu, (unsigned char*)&c, 1, 100);
 }
-
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-   👉 Private functions
-   - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-static UInt uart_convert_baudrate_for_mcu(UartBaudRate baudrate) {
-
-   switch (baudrate) {
-   case MKIT_UART_BAUDRATE_9600:
-      return 9600;
-   case MKIT_UART_BAUDRATE_19200:
-      return 19200;
-   case MKIT_UART_BAUDRATE_38400:
-      return 38400;
-   case MKIT_UART_BAUDRATE_115200:
-      return 115200;
-   case MKIT_UART_BAUDRATE_230400:
-      return 230400;
-   case MKIT_UART_BAUDRATE_460800:
-      return 460800;
-   case MKIT_UART_BAUDRATE_921600:
-      return 921600;
-   default:
-      return 115200;
-   }
-}
-
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-static UInt uart_convert_databits_for_mcu(UartDataBits databits) {
-
-   switch (databits) {
-   case MKIT_UART_DATABITS_8:
-      return UART_WORDLENGTH_8B;
-   default:
-      return UART_WORDLENGTH_8B;
-   }
-}
-
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-static UInt uart_convert_stopbits_for_mcu(UartStopBits stopbits) {
-
-   switch (stopbits) {
-   case MKIT_UART_STOPBITS_1:
-      return UART_STOPBITS_1;
-   case MKIT_UART_STOPBITS_2:
-      return UART_STOPBITS_2;
-   default:
-      return UART_STOPBITS_1;
-   }
-}
-
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-static UInt uart_convert_parity_for_mcu(UartParity parity) {
-
-   switch (parity) {
-   case MKIT_UART_PARITY_NONE:
-      return UART_PARITY_NONE;
-   case MKIT_UART_PARITY_EVEN:
-      return UART_PARITY_EVEN;
-   case MKIT_UART_PARITY_ODD:
-      return UART_PARITY_ODD;
-   default:
-      return UART_PARITY_NONE;
-   }
-}
-
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-UartInterface Uart = {
-    .init = uart_init,
-    .start = uart_start,
-    .stop = uart_stop,
-    .receive = uart_receive,
-    .send = uart_send,
-};

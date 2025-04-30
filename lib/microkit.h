@@ -5,12 +5,20 @@
 #include "libs/microkit/lib/core.h"
 #include "libs/microkit/lib/logger.h"
 #include "libs/microkit/lib/time.h"
+#include "libs/microkit/lib/uart.h"
 
+typedef struct {
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_UART)
+   MicrokitDriverUartInterface uart;
+#endif
+} MicrokitDriverInterface;
 
 typedef struct {
    void (*init)(void);
    void (*start)(void);
    void (*stop)(void);
+
+   MicrokitDriverInterface driver;
 
 #if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_CONSOLE)
    MicrokitConsoleInterface console;
@@ -23,6 +31,7 @@ typedef struct {
 #if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_TIME)
    MicrokitTimeInterface time;
 #endif
+
 } MicrokitInterface;
 
 extern MicrokitInterface Microkit;

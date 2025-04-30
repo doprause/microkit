@@ -11,6 +11,7 @@
 #include "libs/microkit/lib/microkit.h"
 #include "libs/microkit/lib/modules/console/console.h"
 #include "libs/microkit/lib/modules/logger/logger.h"
+#include "libs/microkit/lib/platform/drivers/uart.h"
 #include "libs/microkit/lib/platform/time.h"
 
 static void init(void) {
@@ -27,14 +28,20 @@ MicrokitInterface Microkit = {
     .start = start,
     .stop = stop,
 
+    .driver = {
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_UART)
+        .uart = {
+            .init = microkit_uart_init,
+            .start = microkit_uart_start,
+            .stop = microkit_uart_stop,
+            .receive = microkit_uart_receive,
+            .send = microkit_uart_send,
+        },
+#endif
+    },
+
 #if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_CONSOLE)
-    .console = {
-        .init = microkit_console_init,
-        .start = microkit_console_start,
-        .stop = microkit_console_stop,
-        .read = microkit_console_read,
-        .write = microkit_console_write,
-        .writeLine = microkit_console_write_line},
+    .console = {.init = microkit_console_init, .start = microkit_console_start, .stop = microkit_console_stop, .read = microkit_console_read, .write = microkit_console_write, .writeLine = microkit_console_write_line},
 #endif
 
 #if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_LOGGER)

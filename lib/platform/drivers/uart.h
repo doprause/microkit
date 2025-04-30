@@ -7,105 +7,21 @@
  * @copyright Copyright (c) 2025 - All rights reserved.
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
-#ifndef MICROKIT_UART_H
-#define MICROKIT_UART_H
+#ifndef MICROKIT_DRIVERS_UART_H
+#define MICROKIT_DRIVERS_UART_H
 
-#include "libs/microkit/lib/types.h"
+#include "libs/microkit/lib/core.h"
+#include "libs/microkit/lib/uart.h"
+#include "microkit/config/uart.h"
 
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_UART)
 
-/**
- * @brief UART baudrate settings.
- */
-typedef enum {
-   MKIT_UART_BAUDRATE_9600,
-   MKIT_UART_BAUDRATE_19200,
-   MKIT_UART_BAUDRATE_38400,
-   MKIT_UART_BAUDRATE_115200,
-   MKIT_UART_BAUDRATE_230400,
-   MKIT_UART_BAUDRATE_460800,
-   MKIT_UART_BAUDRATE_921600
-} UartBaudRate;
+void microkit_uart_init(void);
+void microkit_uart_start(const UartDevice device, UartConfig config);
+void microkit_uart_stop(const UartDevice device);
+int microkit_uart_receive(const UartDevice device, UInt8* data, const Size size);
+int microkit_uart_send(const UartDevice device, UInt8* data, const Size size);
 
-/**
- * @brief UART data bits settings.
- */
-typedef enum { MKIT_UART_DATABITS_8 } UartDataBits;
+#endif // MICROKIT_CONFIG_USE_UART
 
-/**
- * @brief UART stop bits settings.
- */
-typedef enum { MKIT_UART_STOPBITS_1,
-               MKIT_UART_STOPBITS_2 } UartStopBits;
-
-/**
- * @brief UART parity settings.
- */
-typedef enum {
-   MKIT_UART_PARITY_NONE,
-   MKIT_UART_PARITY_EVEN,
-   MKIT_UART_PARITY_ODD
-} UartParity;
-
-/**
- * @brief UART configuration.
- */
-typedef struct {
-   const char* format;
-   const UartBaudRate baudrate;
-   const UartDataBits databits;
-   const UartStopBits stopbits;
-   const UartParity parity;
-} UartConfig;
-
-/**
- * @brief UART device pointer.
- */
-typedef struct UartDeviceObject* UartDevice;
-
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-typedef struct {
-   /**
-    * @brief Initializes the enabled UART devices.
-    * UART devices can be enabled in the MCU configuration file.
-    */
-   void (*init)(void);
-
-   /**
-    * @brief Starts and initializes the given UART device with the given
-    * configuration.
-    * @param device The device.
-    * @param config The config.
-    */
-   void (*start)(const UartDevice device, UartConfig config);
-
-   /**
-    * @brief Stops and de-initializes the given UART device.
-    * @param device The device.
-    */
-   void (*stop)(const UartDevice device);
-
-   /**
-    * @brief Sends the given data over the UART device.
-    * @param device The device.
-    * @param data The data to be sent.
-    * @param length The length of the data to be sent.
-    * @return The number of bytes sent.
-    */
-   Int (*send)(const UartDevice device, UInt8* data, Size length);
-
-   /**
-    * @brief Receives up to maxLength bytes from the UART device.
-    * @param device The device.
-    * @param data The received data.
-    * @param maxLength The maximum number of bytes to receive.
-    * @return The number of bytes actually received.
-    */
-   Int (*receive)(const UartDevice device, UInt8* data, Size maxLength);
-
-} UartInterface;
-
-extern UartInterface Uart;
-
-#endif
+#endif // MICROKIT_DRIVERS_UART_H
