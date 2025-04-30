@@ -5,4 +5,4 @@
  */
 #include "microkit.h"
 
-#define MICROKIT_CONFIG_TIME_USE_DELAY_MICROS
+#define MICROKIT_CONFIG_TIME_USE_DELAY_MICROS 1
