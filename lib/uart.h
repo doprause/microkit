@@ -27,14 +27,14 @@ typedef enum {
    MKIT_UART_BAUDRATE_230400,
    MKIT_UART_BAUDRATE_460800,
    MKIT_UART_BAUDRATE_921600
-} UartBaudRate;
+} MicrokitUartBaudRate;
 
 /**
  * @brief UART data bits settings.
  */
 typedef enum {
    MKIT_UART_DATABITS_8,
-} UartDataBits;
+} MicrokitUartDataBits;
 
 /**
  * @brief UART stop bits settings.
@@ -42,7 +42,7 @@ typedef enum {
 typedef enum {
    MKIT_UART_STOPBITS_1,
    MKIT_UART_STOPBITS_2,
-} UartStopBits;
+} MicrokitUartStopBits;
 
 /**
  * @brief UART parity settings.
@@ -51,17 +51,17 @@ typedef enum {
    MKIT_UART_PARITY_NONE,
    MKIT_UART_PARITY_EVEN,
    MKIT_UART_PARITY_ODD
-} UartParity;
+} MicrokitUartParity;
 
 /**
  * @brief UART configuration.
  */
 typedef struct {
    const char* format;
-   const UartBaudRate baudrate;
-   const UartDataBits databits;
-   const UartStopBits stopbits;
-   const UartParity parity;
+   const MicrokitUartBaudRate baudrate;
+   const MicrokitUartDataBits databits;
+   const MicrokitUartStopBits stopbits;
+   const MicrokitUartParity parity;
 } MicrokitUartConfig;
 
 /**
@@ -114,5 +114,4 @@ typedef struct {
 } MicrokitDriverUartInterface;
 
 #endif // MICROKIT_CONFIG_USE_UART
-
 #endif // MICROKIT_UART_H

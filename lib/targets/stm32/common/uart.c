@@ -68,15 +68,15 @@ const MicrokitUartDevice DEVICE_CONSOLE = &DEVICE_UART2;
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    👉 Forward declarations
    - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-static UInt private_uart_convert_baudrate_for_mcu(UartBaudRate baudrate);
-static UInt private_uart_convert_databits_for_mcu(UartDataBits databits);
-static UInt private_uart_convert_stopbits_for_mcu(UartStopBits stopbits);
-static UInt private_uart_convert_parity_for_mcu(UartParity parity);
+static UInt private_uart_convert_baudrate_for_mcu(MicrokitUartBaudRate baudrate);
+static UInt private_uart_convert_databits_for_mcu(MicrokitUartDataBits databits);
+static UInt private_uart_convert_stopbits_for_mcu(MicrokitUartStopBits stopbits);
+static UInt private_uart_convert_parity_for_mcu(MicrokitUartParity parity);
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    👉 Private functions
    - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-static UInt private_uart_convert_baudrate_for_mcu(UartBaudRate baudrate) {
+static UInt private_uart_convert_baudrate_for_mcu(MicrokitUartBaudRate baudrate) {
 
    switch (baudrate) {
    case MKIT_UART_BAUDRATE_9600:
@@ -99,7 +99,7 @@ static UInt private_uart_convert_baudrate_for_mcu(UartBaudRate baudrate) {
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-static UInt private_uart_convert_databits_for_mcu(UartDataBits databits) {
+static UInt private_uart_convert_databits_for_mcu(MicrokitUartDataBits databits) {
 
    switch (databits) {
    case MKIT_UART_DATABITS_8:
@@ -110,7 +110,7 @@ static UInt private_uart_convert_databits_for_mcu(UartDataBits databits) {
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-static UInt private_uart_convert_stopbits_for_mcu(UartStopBits stopbits) {
+static UInt private_uart_convert_stopbits_for_mcu(MicrokitUartStopBits stopbits) {
 
    switch (stopbits) {
    case MKIT_UART_STOPBITS_1:
@@ -123,7 +123,7 @@ static UInt private_uart_convert_stopbits_for_mcu(UartStopBits stopbits) {
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-static UInt private_uart_convert_parity_for_mcu(UartParity parity) {
+static UInt private_uart_convert_parity_for_mcu(MicrokitUartParity parity) {
 
    switch (parity) {
    case MKIT_UART_PARITY_NONE:
