@@ -44,56 +44,56 @@ typedef enum { MKIT_I2C_DIRECTION_READ,
 /**
  * I2C device pointer.
  */
-typedef struct I2cDeviceObject* I2cDevice;
+typedef struct I2cDeviceObject* MicrokitI2cDevice;
 
 /**
  * @brief Handler function for the memory read complete event.
  */
-typedef void (*I2cMasterMemoryReadCompleteHandler)(const I2cDevice device);
+typedef void (*I2cMasterMemoryReadCompleteHandler)(const MicrokitI2cDevice device);
 
 /**
  * @brief Handler function for the memory write complete event.
  */
-typedef void (*I2cMasterMemoryWriteCompleteHandler)(const I2cDevice device);
+typedef void (*I2cMasterMemoryWriteCompleteHandler)(const MicrokitI2cDevice device);
 
 /**
  * @brief Handler function for the master receive complete event.
  */
-typedef void (*I2cMasterReceiveCompleteHandler)(const I2cDevice device);
+typedef void (*I2cMasterReceiveCompleteHandler)(const MicrokitI2cDevice device);
 
 /**
  * @brief Handler function for the master transmit complete event.
  */
-typedef void (*I2cMasterTransmitCompleteHandler)(const I2cDevice device);
+typedef void (*I2cMasterTransmitCompleteHandler)(const MicrokitI2cDevice device);
 
 /**
  * @brief Handler function to provide send a data byte to the I2C master.
  */
-typedef void (*I2cSlaveTransmissionStartedHandler)(const I2cDevice device,
+typedef void (*I2cSlaveTransmissionStartedHandler)(const MicrokitI2cDevice device,
                                                    I2cDirection direction,
                                                    Bool isRepeatedStart);
 
 /**
  * @brief Handler function to provide send a data byte to the I2C master.
  */
-typedef void (*I2cSlaveTransmissionStoppedHandler)(const I2cDevice device);
+typedef void (*I2cSlaveTransmissionStoppedHandler)(const MicrokitI2cDevice device);
 
 /**
  * @brief Handler function to provide send a data byte to the I2C master.
  */
-typedef void (*I2cSlaveTransmissionErrorHandler)(const I2cDevice device,
+typedef void (*I2cSlaveTransmissionErrorHandler)(const MicrokitI2cDevice device,
                                                  I2cError error);
 
 /**
  * @brief Handler function to process a data byte received from the I2C master.
  */
-typedef void (*I2cSlaveByteReceivedHandler)(const I2cDevice device,
+typedef void (*I2cSlaveByteReceivedHandler)(const MicrokitI2cDevice device,
                                             UInt8* byte);
 
 /**
  * @brief Handler function to provide send a data byte to the I2C master.
  */
-typedef void (*I2cSlaveByteRequestedHandler)(const I2cDevice device,
+typedef void (*I2cSlaveByteRequestedHandler)(const MicrokitI2cDevice device,
                                              UInt8* byte);
 
 /**
@@ -133,13 +133,13 @@ typedef struct {
     * @param device The device.
     * @param config The config.
     */
-   void (*start)(const I2cDevice device, I2cConfig config);
+   void (*start)(const MicrokitI2cDevice device, I2cConfig config);
 
    /**
     * @brief Stops and de-initializes the given I2C device.
     * @param device The device.
     */
-   void (*stop)(const I2cDevice device);
+   void (*stop)(const MicrokitI2cDevice device);
 
    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       👉 I2C master mode functions
@@ -154,7 +154,7 @@ typedef struct {
     * @param async Whether to perform the operation asynchronously.
     * @returns A status code (STATUS_OK on success, STATUS_ERROR on error).
     */
-   StatusOrNumber (*receive)(const I2cDevice device, UInt8 deviceAddress,
+   StatusOrNumber (*receive)(const MicrokitI2cDevice device, UInt8 deviceAddress,
                              UInt8* data, Size dataSize, Bool async);
 
    /**
@@ -166,7 +166,7 @@ typedef struct {
     * @param async Whether to perform the operation asynchronously.
     * @returns A status code (STATUS_OK on success, STATUS_ERROR on error).
     */
-   StatusOrNumber (*transmit)(const I2cDevice device, UInt8 deviceAddress,
+   StatusOrNumber (*transmit)(const MicrokitI2cDevice device, UInt8 deviceAddress,
                               UInt8* data, Size dataSize, Bool async);
 
    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -183,7 +183,7 @@ typedef struct {
     * @returns A status code (STATUS_OK on success, STATUS_ERROR on error)
     * or the number of bytes actually read.
     */
-   StatusOrNumber (*memoryRead)(const I2cDevice device, const UInt8 deviceAddress,
+   StatusOrNumber (*memoryRead)(const MicrokitI2cDevice device, const UInt8 deviceAddress,
                                 const UInt16 memoryAddress, const UInt16 memoryAddressSize,
                                 UInt8* data, const Size dataSize, const Bool async);
 
@@ -197,7 +197,7 @@ typedef struct {
     * @returns A status code (STATUS_OK on success, STATUS_ERROR on error)
     * or the number of bytes actually written.
     */
-   StatusOrNumber (*memoryWrite)(const I2cDevice device, const UInt8 deviceAddress,
+   StatusOrNumber (*memoryWrite)(const MicrokitI2cDevice device, const UInt8 deviceAddress,
                                  const UInt16 memoryAddress, const UInt16 memoryAddressSize,
                                  const UInt8* data, const Size dataSize, const Bool async);
 

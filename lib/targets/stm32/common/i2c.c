@@ -55,7 +55,7 @@ struct I2cDeviceObject DEVICE_I2C1_INSTANCE = {
     .state = MKIT_DRIVER_STATE_UNINITIALIZED,
     .mcu = {0},
 };
-I2cDevice DEVICE_I2C1 = &DEVICE_I2C1_INSTANCE;
+MicrokitI2cDevice DEVICE_I2C1 = &DEVICE_I2C1_INSTANCE;
 #endif // MICROKIT_CONFIG_I2C_USE_I2C1
 
 #if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_I2C_USE_I2C2)
@@ -63,7 +63,7 @@ struct I2cDeviceObject DEVICE_I2C2_INSTANCE = {
     .state = MKIT_DRIVER_STATE_UNINITIALIZED,
     .mcu = {0},
 };
-I2cDevice DEVICE_I2C2 = &DEVICE_I2C2_INSTANCE;
+MicrokitI2cDevice DEVICE_I2C2 = &DEVICE_I2C2_INSTANCE;
 #endif // MICROKIT_CONFIG_I2C_USE_I2C2
 
 #if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_I2C_USE_I2C3)
@@ -71,13 +71,13 @@ struct I2cDeviceObject DEVICE_I2C3_INSTANCE = {
     .state = MKIT_DRIVER_STATE_UNINITIALIZED,
     .mcu = {0},
 };
-I2cDevice DEVICE_I2C3 = &DEVICE_I2C3_INSTANCE;
+MicrokitI2cDevice DEVICE_I2C3 = &DEVICE_I2C3_INSTANCE;
 #endif // MICROKIT_CONFIG_I2C_USE_I2C3
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    👉 Private functions
    - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-static inline void rearm_i2c_slave_mode(const I2cDevice device) {
+static inline void rearm_i2c_slave_mode(const MicrokitI2cDevice device) {
 
    device->status.isRepeatedStart = false;
 
@@ -85,7 +85,7 @@ static inline void rearm_i2c_slave_mode(const I2cDevice device) {
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-static inline I2cDevice get_device_from_handle(I2C_HandleTypeDef* handle) {
+static inline MicrokitI2cDevice get_device_from_handle(I2C_HandleTypeDef* handle) {
 #if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_I2C_USE_I2C1)
    if (handle == &DEVICE_I2C1->mcu) {
       return DEVICE_I2C1;
@@ -156,7 +156,7 @@ void microkit_i2c_init(void) {
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-void microkit_i2c_start(const I2cDevice device, I2cConfig config) {
+void microkit_i2c_start(const MicrokitI2cDevice device, I2cConfig config) {
 
    ASSERT_NOT_NULL_POINTER(device);
 
@@ -211,7 +211,7 @@ void microkit_i2c_start(const I2cDevice device, I2cConfig config) {
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-void microkit_i2c_stop(const I2cDevice device) {
+void microkit_i2c_stop(const MicrokitI2cDevice device) {
 
    ASSERT_NOT_NULL_POINTER(device);
 
@@ -222,7 +222,7 @@ void microkit_i2c_stop(const I2cDevice device) {
    👉 I2C master mode functions
    - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 StatusOrNumber microkit_i2c_receive(
-    const I2cDevice device, UInt8 deviceAddress,
+    const MicrokitI2cDevice device, UInt8 deviceAddress,
     UInt8* data, Size dataSize, Bool async) {
 
    ASSERT_NOT_NULL_POINTER(device);
@@ -252,7 +252,7 @@ StatusOrNumber microkit_i2c_receive(
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 StatusOrNumber microkit_i2c_transmit(
-    const I2cDevice device, const UInt8 deviceAddress,
+    const MicrokitI2cDevice device, const UInt8 deviceAddress,
     UInt8* data, Size dataSize, Bool async) {
 
    ASSERT_NOT_NULL_POINTER(device);
@@ -284,7 +284,7 @@ StatusOrNumber microkit_i2c_transmit(
    👉 I2C master mode memory read/write functions
    - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 StatusOrNumber microkit_i2c_memory_read(
-    const I2cDevice device, const UInt8 deviceAddress,
+    const MicrokitI2cDevice device, const UInt8 deviceAddress,
     const UInt16 memoryAddress, const UInt16 memoryAddressSize,
     UInt8* data, const Size dataSize, const Bool async) {
 
@@ -320,7 +320,7 @@ StatusOrNumber microkit_i2c_memory_read(
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 StatusOrNumber microkit_i2c_memory_write(
-    const I2cDevice device, const UInt8 deviceAddress,
+    const MicrokitI2cDevice device, const UInt8 deviceAddress,
     const UInt16 memoryAddress, const UInt16 memoryAddressSize,
     const UInt8* data, const Size dataSize, const Bool async) {
 
@@ -359,7 +359,7 @@ void HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef* handle) {
 
    // I2C master receive completed
 
-   I2cDevice device = get_device_from_handle(handle);
+   MicrokitI2cDevice device = get_device_from_handle(handle);
 
    ASSERT_NOT_NULL_POINTER(device);
 
@@ -375,7 +375,7 @@ void HAL_I2C_MasterTxCpltCallback(I2C_HandleTypeDef* handle) {
 
    // I2C master transmit completed
 
-   I2cDevice device = get_device_from_handle(handle);
+   MicrokitI2cDevice device = get_device_from_handle(handle);
 
    ASSERT_NOT_NULL_POINTER(device);
 
@@ -391,7 +391,7 @@ void HAL_I2C_MemRxCpltCallback(I2C_HandleTypeDef* handle) {
 
    // I2C memory read completed
 
-   I2cDevice device = get_device_from_handle(handle);
+   MicrokitI2cDevice device = get_device_from_handle(handle);
 
    ASSERT_NOT_NULL_POINTER(device);
 
@@ -407,7 +407,7 @@ void HAL_I2C_MemTxCpltCallback(I2C_HandleTypeDef* handle) {
 
    // I2C memory write completed
 
-   I2cDevice device = get_device_from_handle(handle);
+   MicrokitI2cDevice device = get_device_from_handle(handle);
 
    ASSERT_NOT_NULL_POINTER(device);
 
@@ -427,7 +427,7 @@ void HAL_I2C_AddrCallback(I2C_HandleTypeDef* handle, uint8_t TransferDirection,
 
    // I2C START detected / Transmission has started
 
-   I2cDevice device = get_device_from_handle(handle);
+   MicrokitI2cDevice device = get_device_from_handle(handle);
 
    ASSERT_NOT_NULL_POINTER(device->callbacks.slaveTransmissionStartedHandler);
    ASSERT_NOT_NULL_POINTER(device->callbacks.slaveTransmissionErrorHandler);
@@ -478,7 +478,7 @@ void HAL_I2C_AddrCallback(I2C_HandleTypeDef* handle, uint8_t TransferDirection,
 void HAL_I2C_SlaveTxCpltCallback(I2C_HandleTypeDef* handle) {
    // DEBUG_PRINT("I2C SLAVE TX COMPLETE\n");
 
-   I2cDevice device = get_device_from_handle(handle);
+   MicrokitI2cDevice device = get_device_from_handle(handle);
 
    // static uint8 byte = 0x00;
    device->callbacks.slaveByteRequestedHandler(device, &device->slave.txByte);
@@ -493,7 +493,7 @@ void HAL_I2C_SlaveTxCpltCallback(I2C_HandleTypeDef* handle) {
 void HAL_I2C_SlaveRxCpltCallback(I2C_HandleTypeDef* handle) {
    // DEBUG_PRINT("I2C SLAVE RX COMPLETE\n");
 
-   I2cDevice device = get_device_from_handle(handle);
+   MicrokitI2cDevice device = get_device_from_handle(handle);
 
    // static uint8 byte = 0x00;
    if (HAL_I2C_Slave_Seq_Receive_IT(handle, &device->slave.rxByte, 1,
@@ -528,7 +528,7 @@ void HAL_I2C_ListenCpltCallback(I2C_HandleTypeDef* handle) {
 
    // I2C STOP detected / Transmission is complete
 
-   I2cDevice device = get_device_from_handle(handle);
+   MicrokitI2cDevice device = get_device_from_handle(handle);
 
    device->callbacks.slaveTransmissionStoppedHandler(device);
 
@@ -539,7 +539,7 @@ void HAL_I2C_ListenCpltCallback(I2C_HandleTypeDef* handle) {
 void HAL_I2C_ErrorCallback(I2C_HandleTypeDef* handle) {
    // DEBUG_PRINT("I2C ERROR\n");
 
-   I2cDevice device = get_device_from_handle(handle);
+   MicrokitI2cDevice device = get_device_from_handle(handle);
 
    // TODO: Implement error statistics
 
