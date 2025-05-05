@@ -76,7 +76,7 @@ MicrokitInterface Microkit = {
     },
 #endif
 
-#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_CONSOLE)
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_SHELL)
     .shell = {
         .init = microkit_shell_init,
         .start = microkit_shell_start,

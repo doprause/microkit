@@ -7,6 +7,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_SHELL)
+
 extern ShellCommand COMMANDS[];
 extern Size COMMAND_COUNT;
 
@@ -299,3 +301,5 @@ void microkit_shell_write(const ShellModule instance, const char* message) {
 
 //    return instance->supervisor;
 // }
+
+#endif // MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_SHELL)
