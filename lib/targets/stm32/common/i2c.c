@@ -216,6 +216,8 @@ void microkit_i2c_stop(const MicrokitI2cDevice device) {
    ASSERT_NOT_NULL_POINTER(device);
 
    // TODO: Stop STM32 I2C peripheral
+
+   device->state = MKIT_DRIVER_STATE_STOPPED;
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
