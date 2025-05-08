@@ -101,6 +101,9 @@ MicrokitInterface Microkit = {
         .stop = microkit_shell_stop,
         .process = microkit_shell_process,
         .write = microkit_shell_write,
+        .writeError = microkit_shell_write_error,
+        .writeLine = microkit_shell_write_line,
+        .writeNewLine = microkit_shell_write_new_line,
     },
 #endif
 

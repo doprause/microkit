@@ -295,6 +295,24 @@ void microkit_shell_write(const ShellModule instance, const char* message) {
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+void microkit_shell_write_error(const ShellModule instance, const char* message) {
+   microkit_shell_write_new_line(instance, message);
+   // microkit_shell_write_new_line(instance, colorize(message, TERMCOLOR_RED));
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+void microkit_shell_write_line(const ShellModule instance, const char* message) {
+   microkit_shell_write(instance, message);
+   microkit_shell_write(instance, "\n");
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+void microkit_shell_write_new_line(const ShellModule instance, const char* message) {
+   microkit_shell_write(instance, "\n");
+   microkit_shell_write_line(instance, message);
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 // PowerSimulatorInstance powerSimulator(const ShellModule instance) {
 
 //    ASSERT_NOT_NULL_POINTER(instance);

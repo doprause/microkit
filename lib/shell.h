@@ -137,6 +137,28 @@ typedef struct {
     */
    void (*write)(const ShellModule shell, const char* message);
 
+   /**
+    * @brief Writes the error message to the shell output.
+    * @param shell The shell.
+    * @param message The error message to be written.
+    */
+   void (*writeError)(const ShellModule shell, const char* message);
+
+   /**
+    * @brief Writes the message to the shell output and appends a newline character.
+    * @param shell The shell.
+    * @param message The message to be written.
+    */
+   void (*writeLine)(const ShellModule shell, const char* message);
+
+   /**
+    * @brief Writes the message to a new line in the shell output
+    * and appends a newline character.
+    * @param shell The shell.
+    * @param message The message to be written.
+    */
+   void (*writeNewLine)(const ShellModule shell, const char* message);
+
    // /**
    //  * @brief Gets the power simulator instance.
    //  * Typically used to get the power simulator instance within a command handler.
