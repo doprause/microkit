@@ -133,31 +133,35 @@ typedef struct {
    /**
     * @brief Writes the message to the shell output.
     * @param shell The shell.
-    * @param message The message to be written.
+    * @param message The message to be written (printf like format string).
+    * @param ... The arguments to be written.
     */
-   void (*write)(const ShellModule shell, const char* message);
+   void (*write)(const ShellModule shell, const char* message, ...);
 
    /**
     * @brief Writes the error message to the shell output.
     * @param shell The shell.
-    * @param message The error message to be written.
+    * @param message The error message to be written (printf like format string).
+    * @param ... The arguments to be written.
     */
-   void (*writeError)(const ShellModule shell, const char* message);
+   void (*writeError)(const ShellModule shell, const char* message, ...);
 
    /**
     * @brief Writes the message to the shell output and appends a newline character.
     * @param shell The shell.
-    * @param message The message to be written.
+    * @param message The message to be written (printf like format string).
+    * @param ... The arguments to be written.
     */
-   void (*writeLine)(const ShellModule shell, const char* message);
+   void (*writeLine)(const ShellModule shell, const char* message, ...);
 
    /**
     * @brief Writes the message to a new line in the shell output
     * and appends a newline character.
     * @param shell The shell.
-    * @param message The message to be written.
+    * @param message The message to be written (printf like format string).
+    * @param ... The arguments to be written.
     */
-   void (*writeNewLine)(const ShellModule shell, const char* message);
+   void (*writeNewLine)(const ShellModule shell, const char* message, ...);
 
    // /**
    //  * @brief Gets the power simulator instance.

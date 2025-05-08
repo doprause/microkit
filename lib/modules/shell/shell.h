@@ -25,10 +25,10 @@ void microkit_shell_init(
 void microkit_shell_stop(const ShellModule instance);
 void microkit_shell_start(const ShellModule instance);
 void microkit_shell_process(const ShellModule instance);
-void microkit_shell_write(const ShellModule instance, const char* message);
-void microkit_shell_write_error(const ShellModule instance, const char* message);
-void microkit_shell_write_line(const ShellModule instance, const char* message);
-void microkit_shell_write_new_line(const ShellModule instance, const char* message);
+void microkit_shell_write(const ShellModule instance, const char* format, ...);
+void microkit_shell_write_error(const ShellModule instance, const char* format, ...);
+void microkit_shell_write_line(const ShellModule instance, const char* format, ...);
+void microkit_shell_write_new_line(const ShellModule instance, const char* format, ...);
 
 #endif // MICROKIT_CONFIG_USE_SHELL
 #endif // MICROKIT_MODULE_SHELL_H

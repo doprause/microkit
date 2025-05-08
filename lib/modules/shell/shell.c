@@ -4,6 +4,8 @@
 #include "libs/microkit/lib/platform/stdio.h"
 #include "libs/microkit/lib/utils/termcolor.h"
 #include "shell.h"
+#include <stdarg.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -28,6 +30,7 @@ struct MicrokitShellObject {
    Size commandCount;
    bool commandPending;
    char* commandPrompt;
+   bool errorPrinted;
    ShellLogger* loggers;
    bool loggerActive;
    Size loggerCount;
@@ -81,18 +84,28 @@ static Status private_interpret(const ShellModule instance) {
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-static void private_print(const ShellModule shell, const char* message) {
+static void private_print(const ShellModule shell, const char* output) {
 
-   // Uart.send(shell->serial, (UInt8*)message, strlen(message)); // TODO: This doesn't work for some reason
+   // Uart.send(shell->serial, (UInt8*)output, strlen(output)); // TODO: This doesn't work for some reason
 
-   while (*message != '\0') {
-      if (*message == '\r') {
+   for (int i = 0; output[i] != '\0'; i++) {
+      if (output[i] == '\r') {
          mkit_platform_stdio_put('\n');
       } else {
-         mkit_platform_stdio_put(*message);
+         mkit_platform_stdio_put(output[i]);
       }
-      message++;
    }
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+static void private_print_fromatted(const ShellModule shell, const char* format, va_list args) {
+
+   const Size MAX_WRITE_LENGTH = 128;
+   char output[MAX_WRITE_LENGTH];
+
+   vsnprintf(output, MAX_WRITE_LENGTH, format, args);
+
+   private_print(shell, output);
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -182,6 +195,7 @@ void microkit_shell_init(
    instance->commands = COMMANDS;
    instance->commandCount = COMMAND_COUNT;
    instance->commandPending = false;
+   instance->errorPrinted = false;
    instance->loggers = LOGGERS;
    instance->loggerActive = false;
    instance->loggerCount = LOGGER_COUNT;
@@ -257,7 +271,7 @@ void microkit_shell_process(const ShellModule instance) {
    if (instance->commandPending) {
       Status status = private_interpret(instance);
 
-      if (status == STATUS_ERROR) {
+      if (status == STATUS_ERROR && !instance->errorPrinted) {
          private_print(instance, COMMAND_FAILED);
       } else if (status == STATUS_ERROR_UNKNOWN_COMMAND) {
          private_print(instance, COMMAND_UNKNOWN);
@@ -266,6 +280,7 @@ void microkit_shell_process(const ShellModule instance) {
       private_print(instance, instance->prompt);
 
       instance->commandPending = false;
+      instance->errorPrinted = false;
    }
 
    // Process loggers
@@ -286,30 +301,67 @@ void microkit_shell_process(const ShellModule instance) {
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-void microkit_shell_write(const ShellModule instance, const char* message) {
+void microkit_shell_write(const ShellModule instance, const char* format, ...) {
 
    ASSERT_NOT_NULL_POINTER(instance);
    ASSERT(instance->moduleState == MKIT_MODULE_STATE_RUNNING);
 
-   private_print(instance, message);
+   va_list args;
+   va_start(args, format);
+   private_print_fromatted(instance, format, args);
+   va_end(args);
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-void microkit_shell_write_error(const ShellModule instance, const char* message) {
-   microkit_shell_write_new_line(instance, message);
-   // microkit_shell_write_new_line(instance, colorize(message, TERMCOLOR_RED));
+void microkit_shell_write_error(const ShellModule instance, const char* format, ...) {
+   // microkit_shell_write_new_line(instance, format);
+   // microkit_shell_write_new_line(instance, colorize(format, TERMCOLOR_RED));
+
+   ASSERT_NOT_NULL_POINTER(instance);
+   ASSERT(instance->moduleState == MKIT_MODULE_STATE_RUNNING);
+
+   va_list args;
+   va_start(args, format);
+   private_print(instance, "\n");
+   private_print(instance, TERMCOLOR_RED);
+   private_print(instance, "Error: ");
+   private_print(instance, TERMCOLOR_RESET);
+   private_print_fromatted(instance, format, args);
+   private_print(instance, "\n");
+   va_end(args);
+
+   instance->errorPrinted = true;
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-void microkit_shell_write_line(const ShellModule instance, const char* message) {
-   microkit_shell_write(instance, message);
-   microkit_shell_write(instance, "\n");
+void microkit_shell_write_line(const ShellModule instance, const char* format, ...) {
+   // microkit_shell_write(instance, format);
+   // microkit_shell_write(instance, "\n");
+
+   ASSERT_NOT_NULL_POINTER(instance);
+   ASSERT(instance->moduleState == MKIT_MODULE_STATE_RUNNING);
+
+   va_list args;
+   va_start(args, format);
+   private_print_fromatted(instance, format, args);
+   private_print(instance, "\n");
+   va_end(args);
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-void microkit_shell_write_new_line(const ShellModule instance, const char* message) {
-   microkit_shell_write(instance, "\n");
-   microkit_shell_write_line(instance, message);
+void microkit_shell_write_new_line(const ShellModule instance, const char* format, ...) {
+   // microkit_shell_write(instance, "\n");
+   // microkit_shell_write_line(instance, format);
+
+   ASSERT_NOT_NULL_POINTER(instance);
+   ASSERT(instance->moduleState == MKIT_MODULE_STATE_RUNNING);
+
+   va_list args;
+   va_start(args, format);
+   private_print(instance, "\n");
+   private_print_fromatted(instance, format, args);
+   private_print(instance, "\n");
+   va_end(args);
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
