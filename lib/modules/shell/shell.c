@@ -19,7 +19,7 @@ static const int STATUS_ERROR_UNKNOWN_COMMAND = -1000;
 
 static const char* COMMAND_PROMPT = "$ ";                                               // colorize("host-emulator > ", TERMCOLOR_GREY)
 static const char* COMMAND_FAILED = colorize("\nCommand failed\n", TERMCOLOR_RED);      // "\x1b[91mCommand failed\x1b[0m\r\n";
-static const char* COMMAND_UNKNOWN = colorize("\nCommand unknown\n", TERMCOLOR_YELLOW); // "\x1b[36mCommand unknown\x1b[0m\r\n";
+static const char* COMMAND_UNKNOWN = colorize("\nUnknown command\n", TERMCOLOR_YELLOW); // "\x1b[36mCommand unknown\x1b[0m\r\n";
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 struct MicrokitShellObject {
@@ -125,6 +125,11 @@ static void private_process_character(const ShellModule instance, Int32 characte
          strcpy(instance->commandBuffer, instance->receiveBuffer); // Copy message to command buffer
 
          instance->receiveBufferPointer = instance->receiveBuffer; // Reset receive buffer pointer to beginning
+
+         if (strcmp(instance->commandBuffer, "") == 0) {
+            private_print(instance, "\n");
+         }
+
          instance->commandPending = true;
       }
    } else if (character == '\b' || character == 127) {
@@ -133,8 +138,7 @@ static void private_process_character(const ShellModule instance, Int32 characte
       if (instance->receiveBufferPointer > instance->receiveBuffer) {
          instance->receiveBufferPointer--;
          // Remove the last character from console
-         const char echo[] = "\b \b";
-         private_print(instance, echo);
+         private_print(instance, "\b \b");
       }
    } else {
       // Normal character received, add to buffer
