@@ -127,10 +127,14 @@ static void private_process_character(const ShellModule instance, Int32 characte
          instance->receiveBufferPointer = instance->receiveBuffer; // Reset receive buffer pointer to beginning
          instance->commandPending = true;
       }
-   } else if (character == '\b') {
+   } else if (character == '\b' || character == 127) {
       // Backspace. Delete character.
+      // BS (ASCII 8) or DEL (ASCII 127)
       if (instance->receiveBufferPointer > instance->receiveBuffer) {
          instance->receiveBufferPointer--;
+         // Remove the last character from console
+         const char echo[] = "\b \b";
+         private_print(instance, echo);
       }
    } else {
       // Normal character received, add to buffer
