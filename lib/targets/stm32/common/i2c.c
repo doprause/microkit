@@ -249,7 +249,7 @@ StatusOrNumber microkit_i2c_receive(
          ;
    }
 
-   return status ? (int)dataSize : STATUS_ERROR;
+   return status == HAL_OK ? (int)dataSize : STATUS_ERROR;
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
