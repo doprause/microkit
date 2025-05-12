@@ -238,6 +238,8 @@ StatusOrNumber microkit_i2c_receive(
       return STATUS_ERROR;
    }
 
+   HAL_Delay(10); // Without this delay, the transfer is not reliable
+
    device->status.masterReceiveComplete = false;
 
    HAL_StatusTypeDef status = HAL_I2C_Master_Receive_IT(
@@ -267,6 +269,8 @@ StatusOrNumber microkit_i2c_transmit(
    if (device->status.masterTransmitComplete == false) {
       return STATUS_ERROR;
    }
+
+   HAL_Delay(10); // Without this delay, the transfer is not reliable
 
    device->status.masterTransmitComplete = false;
 
@@ -301,6 +305,8 @@ StatusOrNumber microkit_i2c_memory_read(
       return STATUS_ERROR;
    }
 
+   HAL_Delay(10); // Without this delay, the transfer is not reliable
+
    device->status.memoryReadComplete = false;
 
    HAL_StatusTypeDef status = HAL_I2C_Mem_Read_IT(
@@ -332,6 +338,8 @@ StatusOrNumber microkit_i2c_memory_write(
    if (device->status.memoryWriteComplete == false) {
       return STATUS_ERROR;
    }
+
+   HAL_Delay(10); // Without this delay, the transfer is not reliable
 
    device->status.memoryWriteComplete = false;
 
