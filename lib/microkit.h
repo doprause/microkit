@@ -10,6 +10,7 @@
 #include "libs/microkit/lib/shell.h"
 #include "libs/microkit/lib/time.h"
 #include "libs/microkit/lib/timeout.h"
+#include "libs/microkit/lib/types.h"
 #include "libs/microkit/lib/uart.h"
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

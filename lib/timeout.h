@@ -17,7 +17,7 @@
 #if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_TIMEOUT)
 
 /**
- * @brief Handler function for the memory read complete event.
+ * @brief Handler function for a timeout.
  */
 typedef void (*MicrokitTimeoutHandler)(void* target);
 
