@@ -7,6 +7,7 @@
 #include "libs/microkit/lib/logger.h"
 #include "libs/microkit/lib/shell.h"
 #include "libs/microkit/lib/time.h"
+#include "libs/microkit/lib/timeout.h"
 #include "libs/microkit/lib/uart.h"
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -48,6 +49,10 @@ typedef struct {
 
 #if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_TIME)
    MicrokitTimeInterface time;
+#endif
+
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_TIMEOUT)
+   MicrokitTimeoutInterface timeout;
 #endif
 
 } MicrokitInterface;

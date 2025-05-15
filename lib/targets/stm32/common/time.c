@@ -1,3 +1,12 @@
+/** - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ * @file time.c
+ * @author D. Prause
+ * @brief STM32 implementation of the 'Time' platform API.
+ * @version 0.1
+ * @date 2025-05-13
+ * @copyright Copyright (c) 2025
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
 #include "libs/microkit/lib/core.h"
 #include "libs/microkit/lib/platform/time.h"
 #include "microkit/config/microkit.h"
