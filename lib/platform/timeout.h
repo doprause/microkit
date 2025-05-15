@@ -10,7 +10,7 @@
 #ifndef MICROKIT_PLATFORM_TIMEOUT_H
 #define MICROKIT_PLATFORM_TIMEOUT_H
 
-#include "libs/microkit/lib/types.h"
+#include "libs/microkit/lib/timeout.h"
 
 void microkit_timeout_init(void);
 

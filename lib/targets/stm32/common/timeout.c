@@ -75,7 +75,7 @@ void microkit_timeout_process(void) {
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-void microkit_timeout_set(UInt16 timeout, void* target, void (*handler)(void*)) {
+void microkit_timeout_set(UInt16 timeout, void* target, MicrokitTimeoutHandler handler) {
 
    if (private.moduleState != MKIT_MODULE_STATE_RUNNING) {
       return;
@@ -87,7 +87,14 @@ void microkit_timeout_set(UInt16 timeout, void* target, void (*handler)(void*)) 
    UInt16 ticksToTimeout = 1 + (timeout / Systick.interval());
    UInt16 currentTicks = Systick.tickValue();
 
-   private.timeouts[timeout].timeout = currentTicks + ticksToTimeout;
-   private.timeouts[timeout].target = target;
-   private.timeouts[timeout].handler = handler;
+   for (int i = 0; i < MICROKIT_MAX_TIMOUTS; i++) {
+      if (private.timeouts[i].handler == NULL) {
+         private.timeouts[i].timeout = currentTicks + ticksToTimeout;
+         private.timeouts[i].target = target;
+         private.timeouts[i].handler = handler;
+         return;
+      }
+   }
+
+   ASSERT_NOT_REACHED;
 }

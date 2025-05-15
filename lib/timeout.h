@@ -16,9 +16,14 @@
 
 #if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_TIMEOUT)
 
+/**
+ * @brief Handler function for the memory read complete event.
+ */
+typedef void (*MicrokitTimeoutHandler)(void* target);
+
 typedef struct {
 
-   void (*set)(UInt32 timeout, void* target, void (*handler)(void*));
+   void (*set)(UInt32 timeout, void* target, MicrokitTimeoutHandler handler);
 
 } MicrokitTimeoutInterface;
 
