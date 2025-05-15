@@ -1,7 +1,7 @@
 /** - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  * @file time.h
  * @author D. Prause
- * @brief Time platform API.
+ * @brief Time API.
  * @version 0.1
  * @date 2025-05-13
  * @copyright Copyright (c) 2025

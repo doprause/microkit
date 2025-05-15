@@ -1,8 +1,10 @@
 #ifndef MICROKIT_H
 #define MICROKIT_H
 
+#include "libs/microkit/lib/assert.h"
 #include "libs/microkit/lib/console.h"
 #include "libs/microkit/lib/core.h"
+#include "libs/microkit/lib/debug.h"
 #include "libs/microkit/lib/i2c.h"
 #include "libs/microkit/lib/logger.h"
 #include "libs/microkit/lib/shell.h"
