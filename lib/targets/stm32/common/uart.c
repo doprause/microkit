@@ -52,7 +52,7 @@ struct UartDeviceObject DEVICE_UART2 = {.state = MKIT_UART_STATE_CREATED,
 MicrokitUartDevice DEVICE_CONSOLE = &DEVICE_UART1;
 #else
 #error \
-    "To use USART1 for the console, configure CONFIG_MCU_USE_UART1 in config/mcu.h"
+    "To use USART1 for the console, configure MICROKIT_CONFIG_CONSOLE_USE_UART1 in config/mcu.h"
 #endif
 #endif
 
@@ -61,7 +61,7 @@ MicrokitUartDevice DEVICE_CONSOLE = &DEVICE_UART1;
 const MicrokitUartDevice DEVICE_CONSOLE = &DEVICE_UART2;
 #else
 #error \
-    "To use USART2 for the console, configure CONFIG_MCU_USE_UART2 in config/mcu.h"
+    "To use USART2 for the console, configure MICROKIT_CONFIG_CONSOLE_USE_UART2 in config/mcu.h"
 #endif
 #endif
 
