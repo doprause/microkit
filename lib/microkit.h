@@ -6,6 +6,7 @@
 #include "libs/microkit/lib/core.h"
 #include "libs/microkit/lib/debug.h"
 #include "libs/microkit/lib/i2c.h"
+#include "libs/microkit/lib/i3c.h"
 #include "libs/microkit/lib/logger.h"
 #include "libs/microkit/lib/shell.h"
 #include "libs/microkit/lib/time.h"
@@ -20,6 +21,10 @@ typedef struct {
 
 #if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_I2C)
    MicrokitDriverI2cInterface i2c;
+#endif
+
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_I2C)
+   MicrokitDriverI3cInterface i3c;
 #endif
 
 #if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_UART)

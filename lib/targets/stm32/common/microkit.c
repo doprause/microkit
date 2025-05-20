@@ -13,6 +13,7 @@
 #include "libs/microkit/lib/modules/logger/logger.h"
 #include "libs/microkit/lib/modules/shell/shell.h"
 #include "libs/microkit/lib/platform/drivers/i2c.h"
+#include "libs/microkit/lib/platform/drivers/i3c.h"
 #include "libs/microkit/lib/platform/drivers/uart.h"
 #include "libs/microkit/lib/platform/time.h"
 
@@ -58,6 +59,15 @@ MicrokitInterface Microkit = {
             .transmit = microkit_i2c_transmit,
             .memoryRead = microkit_i2c_memory_read,
             .memoryWrite = microkit_i2c_memory_write,
+        },
+#endif
+
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_I3C)
+        .i3c = {
+            .init = microkit_i3c_init,
+            .start = microkit_i3c_start,
+            .stop = microkit_i3c_stop,
+            .process = microkit_i3c_process,
         },
 #endif
 
@@ -140,9 +150,9 @@ void SystemClock_Config(void) {
    RCC_OscInitStruct.HSIDiv = RCC_HSI_DIV2;
    RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
    RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
-   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
-      // Error_Handler();
-   }
+
+   bool ok = HAL_RCC_OscConfig(&RCC_OscInitStruct) == HAL_OK;
+   ASSERT(ok);
 
    /** Initializes the CPU, AHB and APB buses clocks
     */
@@ -153,9 +163,8 @@ void SystemClock_Config(void) {
    RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
    RCC_ClkInitStruct.APB3CLKDivider = RCC_HCLK_DIV1;
 
-   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_1) != HAL_OK) {
-      // Error_Handler();
-   }
+   ok = HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_1) == HAL_OK;
+   ASSERT(ok);
 
    /** Configure the programming delay
     */
