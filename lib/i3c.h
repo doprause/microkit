@@ -110,7 +110,8 @@ typedef struct {
  * @brief I3C configuration.
  */
 typedef struct {
-   I3cTargetDescriptor* targetDescriptors[1];
+   I3cTargetDescriptor* targetDescriptors;
+   Size targetDescriptorsCount;
    //    const I2cMode mode;
    //    const UInt32 address;
    //    I2cMasterMemoryReadCompleteHandler memoryReadCompleteHandler;

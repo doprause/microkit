@@ -3,6 +3,7 @@
 #include "libs/microkit/lib/debug.h"
 #include "libs/microkit/lib/microkit.h"
 #include "libs/microkit/lib/platform/drivers/i3c.h"
+#include "libs/microkit/lib/utils/math.h"
 #include "microkit/config/i3c.h"
 
 #include "stm32h5xx_hal.h"
@@ -68,6 +69,7 @@ struct I3cDeviceObject {
    I3cBusState busState;
    I3cCallbacks callbacks;
    I3cTargetDescriptor targetDescriptors[MICROKIT_CONFIG_I3C2_MAX_TARGET_DESCRIPTORS];
+   Size targetDescriptorsCount;
    // I3cTargetDeviceConfiguration targetConfigurations[MICROKIT_CONFIG_I3C2_MAX_TARGET_DESCRIPTORS];
    Size targetCount;
    //    I2cMode mode;
@@ -84,6 +86,7 @@ struct I3cDeviceObject {
 //     .busState = MKIT_I3C_BUS_STATE_RESET,
 //     .state = MKIT_DRIVER_STATE_UNINITIALIZED,
 //     .targetCount = 0,
+//     .targetDescriptorsCount = 0,
 //     .mcu = {0},
 // };
 // MicrokitI2cDevice DEVICE_I2C1 = &DEVICE_I2C1_INSTANCE;
@@ -94,6 +97,7 @@ struct I3cDeviceObject DEVICE_I3C2_INSTANCE = {
     .busState = MKIT_I3C_BUS_STATE_RESET,
     .state = MKIT_DRIVER_STATE_UNINITIALIZED,
     .targetCount = 0,
+    .targetDescriptorsCount = 0,
     .mcu = {0},
 };
 MicrokitI3cDevice DEVICE_I3C2 = &DEVICE_I3C2_INSTANCE;
@@ -104,6 +108,7 @@ MicrokitI3cDevice DEVICE_I3C2 = &DEVICE_I3C2_INSTANCE;
 //     .busState = MKIT_I3C_BUS_STATE_RESET,
 //     .state = MKIT_DRIVER_STATE_UNINITIALIZED,
 //     .targetCount = 0,
+//     .targetDescriptorsCount = 0,
 //     .mcu = {0},
 // };
 // MicrokitI2cDevice DEVICE_I2C3 = &DEVICE_I2C3_INSTANCE;
@@ -194,6 +199,13 @@ void microkit_i3c_start(const MicrokitI3cDevice device, I3cConfig config) {
    bool ok = false;
 
 #if MICROKIT_CONFIG_I3C2_MODE == MICROKIT_I3C_CONTROLLER_MODE
+   ASSERT_NOT_NULL_POINTER(config.targetDescriptors);
+
+   device->targetDescriptorsCount = min(config.targetDescriptorsCount, MICROKIT_CONFIG_I3C2_MAX_TARGET_DESCRIPTORS);
+   for (Size i = 0; i < device->targetDescriptorsCount; i++) {
+      device->targetDescriptors[i] = config.targetDescriptors[i];
+   }
+
    ok = HAL_I3C_Init(&DEVICE_I3C2->mcu) == HAL_OK;
    ASSERT(ok);
 
@@ -220,6 +232,8 @@ void microkit_i3c_start(const MicrokitI3cDevice device, I3cConfig config) {
 
    ok = HAL_I3C_Ctrl_Config(&DEVICE_I3C2->mcu, &controllerConfig) == HAL_OK;
    ASSERT(ok);
+
+   private_start_dynamic_address_assignment(device);
 #elif MICROKIT_CONFIG_I3C2_MODE == MICROKIT_I3C_TARGET_MODE
    ok = HAL_I3C_Init(&DEVICE_I3C2->mcu) == HAL_OK;
    ASSERT(ok);
@@ -256,7 +270,7 @@ void microkit_i3c_start(const MicrokitI3cDevice device, I3cConfig config) {
    ok = HAL_I3C_Tgt_Config(&DEVICE_I3C2->mcu, &targetConfig) == HAL_OK;
    ASSERT(ok);
 #endif
-   private_start_dynamic_address_assignment(device);
+
    device->state = MKIT_DRIVER_STATE_RUNNING;
 }
 
