@@ -172,9 +172,9 @@ void microkit_i3c_init(void) {
    DEVICE_I3C2->mcu.Mode = HAL_I3C_MODE_CONTROLLER;
    DEVICE_I3C2->mcu.Init.CtrlBusCharacteristic.SDAHoldTime = HAL_I3C_SDA_HOLD_TIME_0_5;
    DEVICE_I3C2->mcu.Init.CtrlBusCharacteristic.WaitTime = HAL_I3C_OWN_ACTIVITY_STATE_0;
-   DEVICE_I3C2->mcu.Init.CtrlBusCharacteristic.SCLPPLowDuration = 0x0f;
-   DEVICE_I3C2->mcu.Init.CtrlBusCharacteristic.SCLI3CHighDuration = 0x09;
-   DEVICE_I3C2->mcu.Init.CtrlBusCharacteristic.SCLODLowDuration = 0x0f;
+   DEVICE_I3C2->mcu.Init.CtrlBusCharacteristic.SCLPPLowDuration = 0x27;
+   DEVICE_I3C2->mcu.Init.CtrlBusCharacteristic.SCLI3CHighDuration = 0x27;
+   DEVICE_I3C2->mcu.Init.CtrlBusCharacteristic.SCLODLowDuration = 0x27;
    DEVICE_I3C2->mcu.Init.CtrlBusCharacteristic.SCLI2CHighDuration = 0x00;
    DEVICE_I3C2->mcu.Init.CtrlBusCharacteristic.BusFreeDuration = 0x06;
    DEVICE_I3C2->mcu.Init.CtrlBusCharacteristic.BusIdleDuration = 0x1e;
@@ -343,37 +343,57 @@ void microkit_i3c_process(const MicrokitI3cDevice device) {
 //    return status == HAL_OK ? (int)dataSize : STATUS_ERROR;
 // }
 
-// /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-// StatusOrNumber microkit_i2c_transmit(
-//     const MicrokitI2cDevice device, const UInt8 deviceAddress,
-//     UInt8* data, Size dataSize, Bool async) {
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+StatusOrNumber microkit_i3c_transmit(
+    const MicrokitI3cDevice device, const UInt8 deviceAddress,
+    UInt8* data, Size dataSize, Bool async) {
 
-//    ASSERT_NOT_NULL_POINTER(device);
-//    ASSERT(device->state == MKIT_DRIVER_STATE_RUNNING);
+   ASSERT_NOT_NULL_POINTER(device);
+   ASSERT(device->state == MKIT_DRIVER_STATE_RUNNING);
 
-//    if (HAL_I2C_GetState(&device->mcu) != HAL_I2C_STATE_READY) {
-//       return STATUS_ERROR;
-//    }
+   if (device->busState != MKIT_I3C_BUS_STATE_READY) {
+      return STATUS_ERROR;
+   }
 
-//    if (device->status.masterTransmitComplete == false) {
-//       return STATUS_ERROR;
-//    }
+   //    if (HAL_I2C_GetState(&device->mcu) != HAL_I2C_STATE_READY) {
+   //       return STATUS_ERROR;
+   //    }
 
-//    HAL_Delay(10); // Without this delay, the transfer is not reliable
+   //    if (device->status.masterTransmitComplete == false) {
+   //       return STATUS_ERROR;
+   //    }
 
-//    device->status.masterTransmitComplete = false;
+   HAL_Delay(10); // Without this delay, the transfer is not reliable
 
-//    HAL_StatusTypeDef status = HAL_I2C_Master_Transmit_IT(
-//        &device->mcu, deviceAddress << 1, data, dataSize);
+   //    device->status.masterTransmitComplete = false;
 
-//    // If we are not in async mode, we need to wait for the transfer to complete
-//    if (!async) {
-//       while (!device->status.masterTransmitComplete)
-//          ;
-//    }
+   UInt32 controlBuffer[1];
 
-//    return status == HAL_OK ? (int)dataSize : STATUS_ERROR;
-// }
+   I3C_PrivateTypeDef transferDescriptor =
+       {deviceAddress, {data, dataSize}, {NULL, 0}, HAL_I3C_DIRECTION_WRITE};
+
+   I3C_XferTypeDef context;
+   context.CtrlBuf.pBuffer = controlBuffer;
+   context.CtrlBuf.Size = sizeof(controlBuffer);
+   context.TxBuf.pBuffer = data;
+   context.TxBuf.Size = dataSize;
+
+   HAL_StatusTypeDef status = HAL_I3C_AddDescToFrame(&device->mcu, NULL, &transferDescriptor, &context, 1, I3C_PRIVATE_WITH_ARB_RESTART);
+
+   if (status != HAL_OK) {
+      return STATUS_ERROR;
+   }
+
+   status = HAL_I3C_Ctrl_Transmit_IT(&device->mcu, &context);
+
+   //    // If we are not in async mode, we need to wait for the transfer to complete
+   //    if (!async) {
+   //       while (!device->status.masterTransmitComplete)
+   //          ;
+   //    }
+
+   return status == HAL_OK ? (int)dataSize : STATUS_ERROR;
+}
 
 // /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //    👉 I2C master mode memory read/write functions

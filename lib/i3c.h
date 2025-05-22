@@ -171,17 +171,17 @@ typedef struct {
    //    StatusOrNumber (*receive)(const MicrokitI2cDevice device, UInt8 deviceAddress,
    //                              UInt8* data, Size dataSize, Bool async);
 
-   //    /**
-   //     * @brief Writes #dataSize bytes to the slave device.
-   //     * @param device The device.
-   //     * @param deviceAddress The slave deviceAddress.
-   //     * @param data The data to transmit.
-   //     * @param dataSize The length of the data to be transmitted.
-   //     * @param async Whether to perform the operation asynchronously.
-   //     * @returns A status code (STATUS_OK on success, STATUS_ERROR on error).
-   //     */
-   //    StatusOrNumber (*transmit)(const MicrokitI2cDevice device, UInt8 deviceAddress,
-   //                               UInt8* data, Size dataSize, Bool async);
+   /**
+    * @brief Writes #dataSize bytes to the slave device.
+    * @param device The device.
+    * @param deviceAddress The slave deviceAddress.
+    * @param data The data to transmit.
+    * @param dataSize The length of the data to be transmitted.
+    * @param async Whether to perform the operation asynchronously.
+    * @returns A status code (STATUS_OK on success, STATUS_ERROR on error).
+    */
+   StatusOrNumber (*transmit)(const MicrokitI3cDevice device, UInt8 deviceAddress,
+                              UInt8* data, Size dataSize, Bool async);
 
    //    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    //       👉 I2C master mode memory read/write functions

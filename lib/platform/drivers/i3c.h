@@ -16,9 +16,9 @@ void microkit_i3c_process(const MicrokitI3cDevice device);
 //     const MicrokitI2cDevice device, UInt8 deviceAddress,
 //     UInt8* data, Size dataSize, Bool async);
 
-// StatusOrNumber microkit_i2c_transmit(
-//     const MicrokitI2cDevice device, const UInt8 deviceAddress,
-//     UInt8* data, Size dataSize, Bool async);
+StatusOrNumber microkit_i3c_transmit(
+    const MicrokitI3cDevice device, const UInt8 deviceAddress,
+    UInt8* data, Size dataSize, Bool async);
 
 // StatusOrNumber microkit_i2c_memory_read(
 //     const MicrokitI2cDevice device, const UInt8 deviceAddress,
