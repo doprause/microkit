@@ -27,8 +27,9 @@
 typedef enum {
    MKIT_I3C_BUS_STATE_RESET,
    MKIT_I3C_BUS_STATE_READY,
-   MKIT_I3C_BUS_STATE_READING,
-   MKIT_I3C_BUS_STATE_WRITING,
+   MKIT_I3C_BUS_STATE_LISTENING,
+   MKIT_I3C_BUS_STATE_RECEIVING,
+   MKIT_I3C_BUS_STATE_TRANSMITTING,
    MKIT_I3C_BUS_STATE_DYN_ADDR_ASSIGNMENT_RUNNING,
    MKIT_I3C_BUS_STATE_DYN_ADDR_ASSIGNMENT_FINISHED,
    MKIT_I3C_BUS_STATE_ERROR,
@@ -75,22 +76,30 @@ struct I3cDeviceObject {
    //    I2cMode mode;
    //    I2cStatus status;
    //    I2cSlaveState slave;
+   UInt8 targetReceiveBuffer[1];
+   bool targetAddressAssignmentComplete;
+   bool targetReceiveComplete;
+   bool targetTransmitComplete;
    I3C_HandleTypeDef mcu;
+   I3C_XferTypeDef mcuContextBuffers;
 };
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    👉 Configuration
    - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-// #if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_I2C_USE_I2C1)
-// struct I2cDeviceObject DEVICE_I2C1_INSTANCE = {
-//     .busState = MKIT_I3C_BUS_STATE_RESET,
-//     .state = MKIT_DRIVER_STATE_UNINITIALIZED,
-//     .targetCount = 0,
-//     .targetDescriptorsCount = 0,
-//     .mcu = {0},
-// };
-// MicrokitI2cDevice DEVICE_I2C1 = &DEVICE_I2C1_INSTANCE;
-// #endif // MICROKIT_CONFIG_I2C_USE_I2C1
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_I3C_USE_I3C1)
+struct I3cDeviceObject DEVICE_I3C1_INSTANCE = {
+    .busState = MKIT_I3C_BUS_STATE_RESET,
+    .state = MKIT_DRIVER_STATE_UNINITIALIZED,
+    .targetCount = 0,
+    .targetDescriptorsCount = 0,
+    .targetAddressAssignmentComplete = false,
+    .targetReceiveComplete = false,
+    .targetTransmitComplete = false,
+    .mcu = {0},
+};
+MicrokitI3cDevice DEVICE_I3C1 = &DEVICE_I3C1_INSTANCE;
+#endif // MICROKIT_CONFIG_I3C_USE_I3C1
 
 #if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_I3C_USE_I3C2)
 struct I3cDeviceObject DEVICE_I3C2_INSTANCE = {
@@ -98,33 +107,32 @@ struct I3cDeviceObject DEVICE_I3C2_INSTANCE = {
     .state = MKIT_DRIVER_STATE_UNINITIALIZED,
     .targetCount = 0,
     .targetDescriptorsCount = 0,
+    .targetAddressAssignmentComplete = false,
+    .targetReceiveComplete = false,
+    .targetTransmitComplete = false,
     .mcu = {0},
 };
 MicrokitI3cDevice DEVICE_I3C2 = &DEVICE_I3C2_INSTANCE;
 #endif // MICROKIT_CONFIG_I3C_USE_I3C2
 
-// #if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_I2C_USE_I2C3)
-// struct I2cDeviceObject DEVICE_I2C3_INSTANCE = {
-//     .busState = MKIT_I3C_BUS_STATE_RESET,
-//     .state = MKIT_DRIVER_STATE_UNINITIALIZED,
-//     .targetCount = 0,
-//     .targetDescriptorsCount = 0,
-//     .mcu = {0},
-// };
-// MicrokitI2cDevice DEVICE_I2C3 = &DEVICE_I2C3_INSTANCE;
-// #endif // MICROKIT_CONFIG_I2C_USE_I2C3
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_I3C_USE_I3C3)
+struct I3cDeviceObject DEVICE_I3C3_INSTANCE = {
+    .busState = MKIT_I3C_BUS_STATE_RESET,
+    .state = MKIT_DRIVER_STATE_UNINITIALIZED,
+    .targetCount = 0,
+    .targetDescriptorsCount = 0,
+    .targetAddressAssignmentComplete = false,
+    .targetReceiveComplete = false,
+    .targetTransmitComplete = false,
+    .mcu = {0},
+};
+MicrokitI3cDevice DEVICE_I3C3 = &DEVICE_I3C3_INSTANCE;
+#endif // MICROKIT_CONFIG_I3C_USE_I3C3
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    👉 Private functions
    - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-// static inline void rearm_i2c_slave_mode(const MicrokitI2cDevice device) {
 
-//    device->status.isRepeatedStart = false;
-
-//    HAL_I2C_EnableListen_IT(&device->mcu);
-// }
-
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 static inline MicrokitI3cDevice private_get_device_from_handle(I3C_HandleTypeDef* handle) {
 #if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_I3C_USE_I3C1)
    if (handle == &DEVICE_I3C1->mcu) {
@@ -148,13 +156,33 @@ static inline MicrokitI3cDevice private_get_device_from_handle(I3C_HandleTypeDef
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-void private_start_dynamic_address_assignment(MicrokitI3cDevice device) {
+void private_controller_start_dynamic_address_assignment(MicrokitI3cDevice device) {
 
    device->busState = MKIT_I3C_BUS_STATE_DYN_ADDR_ASSIGNMENT_RUNNING;
 
    if (HAL_I3C_Ctrl_DynAddrAssign_IT(&device->mcu, I3C_ONLY_ENTDAA) != HAL_OK) {
       device->busState = MKIT_I3C_BUS_STATE_ERROR;
    }
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+void private_target_activate_notifications(MicrokitI3cDevice device) {
+   bool ok = HAL_I3C_ActivateNotification(&device->mcu, NULL, (HAL_I3C_IT_DAUPDIE | HAL_I3C_IT_FCIE)) == HAL_OK;
+   ASSERT(ok);
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+void private_target_start_listening(MicrokitI3cDevice device) {
+
+   device->mcuContextBuffers.RxBuf.pBuffer = device->targetReceiveBuffer;
+   device->mcuContextBuffers.RxBuf.Size = ARRAY_SIZE(device->targetReceiveBuffer);
+
+   bool ok = HAL_I3C_Tgt_Receive_IT(&device->mcu, &device->mcuContextBuffers) == HAL_OK;
+   ASSERT(ok);
+
+   device->busState = MKIT_I3C_BUS_STATE_LISTENING;
+
+   Microkit.logger.log(MKIT_LOG_LEVEL_TRACE, "[I3C] Start listening");
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -233,7 +261,7 @@ void microkit_i3c_start(const MicrokitI3cDevice device, I3cConfig config) {
    ok = HAL_I3C_Ctrl_Config(&DEVICE_I3C2->mcu, &controllerConfig) == HAL_OK;
    ASSERT(ok);
 
-   private_start_dynamic_address_assignment(device);
+   private_controller_start_dynamic_address_assignment(device);
 #elif MICROKIT_CONFIG_I3C2_MODE == MICROKIT_I3C_TARGET_MODE
    ok = HAL_I3C_Init(&DEVICE_I3C2->mcu) == HAL_OK;
    ASSERT(ok);
@@ -269,6 +297,8 @@ void microkit_i3c_start(const MicrokitI3cDevice device, I3cConfig config) {
 
    ok = HAL_I3C_Tgt_Config(&DEVICE_I3C2->mcu, &targetConfig) == HAL_OK;
    ASSERT(ok);
+
+   private_target_activate_notifications(device);
 #endif
 
    device->state = MKIT_DRIVER_STATE_RUNNING;
@@ -306,6 +336,30 @@ void microkit_i3c_process(const MicrokitI3cDevice device) {
       }
 
       device->busState = MKIT_I3C_BUS_STATE_READY;
+   }
+
+   if (device->targetAddressAssignmentComplete) {
+      device->targetAddressAssignmentComplete = false;
+
+      Microkit.logger.log(MKIT_LOG_LEVEL_TRACE, "[I3C] Address assigned");
+
+      private_target_start_listening(device);
+   }
+
+   if (device->targetReceiveComplete) {
+      device->targetReceiveComplete = false;
+
+      Microkit.logger.log(MKIT_LOG_LEVEL_TRACE, "[I3C] Received: 0x%02X", device->targetReceiveBuffer[0]);
+
+      private_target_start_listening(device);
+   }
+
+   if (device->targetTransmitComplete) {
+      device->targetTransmitComplete = false;
+
+      Microkit.logger.log(MKIT_LOG_LEVEL_TRACE, "[I3C] Transmitted 0x%02X");
+
+      private_target_start_listening(device);
    }
 }
 
@@ -476,7 +530,7 @@ StatusOrNumber microkit_i3c_transmit(
    - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 void HAL_I3C_TgtReqDynamicAddrCallback(I3C_HandleTypeDef* handle, uint64_t targetPayload) {
 
-   // Called when a target responded to a dynamic address request
+   // Called on controller when a target responded to a dynamic address request
 
    MicrokitI3cDevice device = private_get_device_from_handle(handle);
 
@@ -495,256 +549,48 @@ void HAL_I3C_TgtReqDynamicAddrCallback(I3C_HandleTypeDef* handle, uint64_t targe
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 void HAL_I3C_CtrlDAACpltCallback(I3C_HandleTypeDef* handle) {
 
-   // Called when all targets have been assigned a dynamic address
+   // Called on controller when all targets have been assigned a dynamic address
 
    MicrokitI3cDevice device = private_get_device_from_handle(handle);
 
    device->busState = MKIT_I3C_BUS_STATE_DYN_ADDR_ASSIGNMENT_FINISHED;
 }
 
-// void HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef* handle) {
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+void HAL_I3C_NotifyCallback(I3C_HandleTypeDef* handle, UInt32 eventId) {
 
-//    // I2C master receive completed
+   // Called on controller and target for all enabled interrupts/events
 
-//    MicrokitI2cDevice device = private_get_device_from_handle(handle);
+   MicrokitI3cDevice device = private_get_device_from_handle(handle);
 
-//    ASSERT_NOT_NULL_POINTER(device);
+   if ((eventId & EVENT_ID_DAU) == EVENT_ID_DAU) {
+      device->busState = MKIT_I3C_BUS_STATE_READY;
 
-//    if (device->callbacks.masterReceiveCompleteHandler) {
-//       device->callbacks.masterReceiveCompleteHandler(device);
-//    }
+      device->targetAddressAssignmentComplete = true;
+   }
+}
 
-//    device->status.masterReceiveComplete = true;
-// }
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+void HAL_I3C_TgtRxCpltCallback(I3C_HandleTypeDef* handle) {
 
-// /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-// void HAL_I2C_MasterTxCpltCallback(I2C_HandleTypeDef* handle) {
+   // Called on target when all data of a transmission is received
 
-//    // I2C master transmit completed
+   MicrokitI3cDevice device = private_get_device_from_handle(handle);
 
-//    MicrokitI2cDevice device = private_get_device_from_handle(handle);
+   device->targetReceiveComplete = true;
+}
 
-//    ASSERT_NOT_NULL_POINTER(device);
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+void HAL_I3C_TgtTxCpltCallback(I3C_HandleTypeDef* handle) {
 
-//    if (device->callbacks.masterTransmitCompleteHandler) {
-//       device->callbacks.masterTransmitCompleteHandler(device);
-//    }
+   // Called when target has transmitted all data of a transmission
 
-//    device->status.masterTransmitComplete = true;
-// }
+   MicrokitI3cDevice device = private_get_device_from_handle(handle);
 
-// /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-// void HAL_I2C_MemRxCpltCallback(I2C_HandleTypeDef* handle) {
+   device->targetTransmitComplete = true;
+}
 
-//    // I2C memory read completed
-
-//    MicrokitI2cDevice device = private_get_device_from_handle(handle);
-
-//    ASSERT_NOT_NULL_POINTER(device);
-
-//    if (device->callbacks.memoryReadCompleteHandler) {
-//       device->callbacks.memoryReadCompleteHandler(device);
-//    }
-
-//    device->status.memoryReadComplete = true;
-// }
-
-// /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-// void HAL_I2C_MemTxCpltCallback(I2C_HandleTypeDef* handle) {
-
-//    // I2C memory write completed
-
-//    MicrokitI2cDevice device = private_get_device_from_handle(handle);
-
-//    ASSERT_NOT_NULL_POINTER(device);
-
-//    if (device->callbacks.memoryWriteCompleteHandler) {
-//       device->callbacks.memoryWriteCompleteHandler(device);
-//    }
-
-//    device->status.memoryWriteComplete = true;
-// }
-
-// /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-// #if MICROKIT_IS_CONFIGURED(CONFIG_I2C_USE_SLAVE_MODE) // 👉 Slave mode code
-// /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-// void HAL_I2C_AddrCallback(I2C_HandleTypeDef* handle, uint8_t TransferDirection,
-//                           uint16_t AddrMatchCode) {
-//    // DEBUG_PRINT("I2C ADDRESS MATCH\n");
-
-//    // I2C START detected / Transmission has started
-
-//    MicrokitI2cDevice device = private_get_device_from_handle(handle);
-
-//    ASSERT_NOT_NULL_POINTER(device->callbacks.slaveTransmissionStartedHandler);
-//    ASSERT_NOT_NULL_POINTER(device->callbacks.slaveTransmissionErrorHandler);
-
-//    if (TransferDirection == I2C_DIRECTION_TRANSMIT) {
-//       // DEBUG_PRINT("I2C TX\n");
-
-//       // Master wants to transmit data. So we - the slave - receive it
-
-//       device->callbacks.slaveTransmissionStartedHandler(
-//           device, MKIT_I2C_DIRECTION_WRITE, device->status.isRepeatedStart);
-
-//       // I2C_FIRST_FRAME means SLAVE receives the first byte of a sequence.
-//       if (HAL_I2C_Slave_Seq_Receive_IT(handle, &device->slave.rxByte, 1,
-//                                        I2C_FIRST_FRAME) != HAL_OK) {
-//          //     device->callbacks.slaveByteReceivedHandler(device, &byte);
-//          // }
-//          // else {
-//          device->callbacks.slaveTransmissionErrorHandler(device,
-//                                                          MKIT_I2C_ERROR);
-//       }
-//    } else {
-//       // DEBUG_PRINT("I2C RX\n");
-
-//       // Master wants to receive data. So we - the slave - transmit it
-
-//       device->callbacks.slaveTransmissionStartedHandler(
-//           device, MKIT_I2C_DIRECTION_READ, device->status.isRepeatedStart);
-
-//       device->callbacks.slaveByteRequestedHandler(device,
-//                                                   &device->slave.txByte);
-
-//       // I2C_FIRST_FRAME means SLAVE transmits the first byte of a sequence.
-//       if (HAL_I2C_Slave_Seq_Transmit_IT(handle, &device->slave.txByte, 1,
-//                                         I2C_FIRST_FRAME) != HAL_OK) {
-//          device->callbacks.slaveTransmissionErrorHandler(device,
-//                                                          MKIT_I2C_ERROR);
-//       }
-//    }
-
-//    // The isRepeatedStart is set to true on first START condition so it is true
-//    // on consecutive START conditions. It will be reset to false on STOP
-//    // condition.
-//    device->status.isRepeatedStart = true;
-// }
-
-// /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-// void HAL_I2C_SlaveTxCpltCallback(I2C_HandleTypeDef* handle) {
-//    // DEBUG_PRINT("I2C SLAVE TX COMPLETE\n");
-
-//    MicrokitI2cDevice device = private_get_device_from_handle(handle);
-
-//    // static uint8 byte = 0x00;
-//    device->callbacks.slaveByteRequestedHandler(device, &device->slave.txByte);
-//    // DEBUG_PRINT("I2C SLAVE TX COMPLETE > 0x%02x\n", device->slave.txByte);
-
-//    // I2C_NEXT_FRAME means SLAVE is ready to transmit another byte.
-//    HAL_I2C_Slave_Seq_Transmit_IT(handle, &device->slave.txByte, 1,
-//                                  I2C_NEXT_FRAME);
-// }
-
-// /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-// void HAL_I2C_SlaveRxCpltCallback(I2C_HandleTypeDef* handle) {
-//    // DEBUG_PRINT("I2C SLAVE RX COMPLETE\n");
-
-//    MicrokitI2cDevice device = private_get_device_from_handle(handle);
-
-//    // static uint8 byte = 0x00;
-//    if (HAL_I2C_Slave_Seq_Receive_IT(handle, &device->slave.rxByte, 1,
-//                                     I2C_NEXT_FRAME) == HAL_OK) {
-//       device->callbacks.slaveByteReceivedHandler(device, &device->slave.rxByte);
-//    } else {
-//       device->callbacks.slaveTransmissionErrorHandler(device, MKIT_I2C_ERROR);
-//    }
-
-//    // TODO: Check if we need to handle the LAST_FRAME
-
-//    // if (rxcount < RX_BUFFER_SIZE) {
-//    // 	if (rxcount == RX_BUFFER_SIZE-1)
-//    // 	{
-//    // 		HAL_I2C_Slave_Seq_Receive_IT(handle, &byte, 1, I2C_LAST_FRAME);
-//    // 	}
-//    // 	else
-//    // 	{
-//    // 		HAL_I2C_Slave_Seq_Receive_IT(handle, &byte, 1, I2C_NEXT_FRAME);
-//    // 	}
-//    // }
-
-//    // if (rxcount == RX_BUFFER_SIZE)
-//    // {
-//    // 	// Invoke processing callback
-//    // }
-// }
-
-// /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-// void HAL_I2C_ListenCpltCallback(I2C_HandleTypeDef* handle) {
-//    // DEBUG_PRINT("I2C LISTEN COMPLETE\n");
-
-//    // I2C STOP detected / Transmission is complete
-
-//    MicrokitI2cDevice device = private_get_device_from_handle(handle);
-
-//    device->callbacks.slaveTransmissionStoppedHandler(device);
-
-//    rearm_i2c_slave_mode(device);
-// }
-
-// /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-// void HAL_I2C_ErrorCallback(I2C_HandleTypeDef* handle) {
-//    // DEBUG_PRINT("I2C ERROR\n");
-
-//    MicrokitI2cDevice device = private_get_device_from_handle(handle);
-
-//    // TODO: Implement error statistics
-
-//    UInt32 errorcode = HAL_I2C_GetError(handle);
-
-//    if (errorcode == HAL_I2C_ERROR_BERR) {
-//       // BERR error
-
-//       // DEBUG_PRINT("I2C BUS ERROR\n");
-
-//       HAL_I2C_DeInit(handle);
-//       HAL_I2C_Init(handle);
-//    } else if (errorcode == HAL_I2C_ERROR_AF) {
-//       // AF error
-
-//       // DEBUG_PRINT("I2C ACK ERROR\n");
-
-//       // ACK Failure is raised when master sends a STOP before buffer is full.
-//       // Instead an error, we treat it as a regular STOP condition.
-//       // We don't have to call the slaveTransmissionStoppedHandler(device)
-//       // callback because the listen complete handler is called which then calls
-//       // the slaveTransmissionStoppedHandler(device) callback
-//    } else {
-//       Microkit.logger.log(MKIT_LOG_LEVEL_WARN, "UNHANDLED I2C ERROR [%d]", errorcode);
-//    }
-
-//    if (device->mode == MKIT_I2C_MODE_MASTER) {
-//       if (device->callbacks.masterReceiveCompleteHandler) {
-//          device->callbacks.masterReceiveCompleteHandler(device);
-//       }
-
-//       if (device->callbacks.masterTransmitCompleteHandler) {
-//          device->callbacks.masterTransmitCompleteHandler(device);
-//       }
-
-//       if (device->callbacks.memoryReadCompleteHandler) {
-//          device->callbacks.memoryReadCompleteHandler(device);
-//       }
-
-//       if (device->callbacks.memoryWriteCompleteHandler) {
-//          device->callbacks.memoryWriteCompleteHandler(device);
-//       }
-
-//       device->status.masterReceiveComplete = true;
-//       device->status.masterTransmitComplete = true;
-//       device->status.memoryReadComplete = true;
-//       device->status.memoryWriteComplete = true;
-//    }
-
-//    if (device->mode == MKIT_I2C_MODE_SLAVE) {
-//       rearm_i2c_slave_mode(device);
-//    }
-// }
-// /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-// #endif // CONFIG_I2C_USE_SLAVE_MODE
-// /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-// /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 #if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_I3C_USE_I3C1)
 void I3C1_EV_IRQHandler(void) {
    HAL_I3C_EV_IRQHandler(&DEVICE_I3C1->mcu);
@@ -763,7 +609,7 @@ void I3C3_EV_IRQHandler(void) {
 }
 #endif
 
-// /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 #if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_I3C_USE_I3C1)
 void I3C1_ER_IRQHandler(void) {
    HAL_I3C_ER_IRQHandler(&DEVICE_I3C1->mcu);
