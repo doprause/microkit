@@ -74,7 +74,7 @@ struct I3cDeviceObject {
    // I3cTargetDeviceConfiguration targetConfigurations[MICROKIT_CONFIG_I3C2_MAX_TARGET_DESCRIPTORS];
    Size targetCount;
    //    I2cMode mode;
-   //    I2cStatus status;
+   // I3cStatus status;
    //    I2cSlaveState slave;
    UInt8 targetReceiveBuffer[1];
    bool targetAddressAssignmentComplete;
@@ -409,44 +409,46 @@ StatusOrNumber microkit_i3c_transmit(
       return STATUS_ERROR;
    }
 
-   //    if (HAL_I2C_GetState(&device->mcu) != HAL_I2C_STATE_READY) {
-   //       return STATUS_ERROR;
-   //    }
-
-   //    if (device->status.masterTransmitComplete == false) {
-   //       return STATUS_ERROR;
-   //    }
-
    HAL_Delay(10); // Without this delay, the transfer is not reliable
 
-   //    device->status.masterTransmitComplete = false;
-
-   UInt32 controlBuffer[1];
+   device->busState = MKIT_I3C_BUS_STATE_TRANSMITTING;
 
    I3C_PrivateTypeDef transferDescriptor =
        {deviceAddress, {data, dataSize}, {NULL, 0}, HAL_I3C_DIRECTION_WRITE};
 
+   UInt32 controlBuffer[1];
    I3C_XferTypeDef context;
    context.CtrlBuf.pBuffer = controlBuffer;
    context.CtrlBuf.Size = sizeof(controlBuffer);
    context.TxBuf.pBuffer = data;
    context.TxBuf.Size = dataSize;
 
-   HAL_StatusTypeDef status = HAL_I3C_AddDescToFrame(&device->mcu, NULL, &transferDescriptor, &context, 1, I3C_PRIVATE_WITH_ARB_RESTART);
+   HAL_StatusTypeDef status = HAL_I3C_AddDescToFrame(&device->mcu, NULL, &transferDescriptor, &context, 1, I3C_PRIVATE_WITH_ARB_STOP);
 
    if (status != HAL_OK) {
+      device->busState = MKIT_I3C_BUS_STATE_READY;
       return STATUS_ERROR;
    }
 
    status = HAL_I3C_Ctrl_Transmit_IT(&device->mcu, &context);
 
    //    // If we are not in async mode, we need to wait for the transfer to complete
-   //    if (!async) {
-   //       while (!device->status.masterTransmitComplete)
-   //          ;
-   //    }
+   // if (!async) {
+   //    while (!device->status.masterTransmitComplete)
+   //       ;
+   // }
+
+   device->busState = MKIT_I3C_BUS_STATE_READY;
 
    return status == HAL_OK ? (int)dataSize : STATUS_ERROR;
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+bool microkit_i3c_is_i3c_target_ready(const MicrokitI3cDevice device, const UInt8 deviceAddress) {
+
+   ASSERT_NOT_NULL_POINTER(device);
+
+   return HAL_I3C_Ctrl_IsDeviceI3C_Ready(&device->mcu, deviceAddress, 1, 1000) == HAL_OK;
 }
 
 // /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -559,9 +561,7 @@ void HAL_I3C_CtrlDAACpltCallback(I3C_HandleTypeDef* handle) {
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 void HAL_I3C_NotifyCallback(I3C_HandleTypeDef* handle, UInt32 eventId) {
 
-   // Called on controller and target for all enabled interrupts/events
-
-   MicrokitI3cDevice device = private_get_device_from_handle(handle);
+	MicrokitI3cDevice device = private_get_device_from_handle(handle);
 
    if ((eventId & EVENT_ID_DAU) == EVENT_ID_DAU) {
       device->busState = MKIT_I3C_BUS_STATE_READY;
