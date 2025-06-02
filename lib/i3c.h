@@ -201,19 +201,19 @@ typedef struct {
    //                                 const UInt16 memoryAddress, const UInt16 memoryAddressSize,
    //                                 UInt8* data, const Size dataSize, const Bool async);
 
-   //    /**
-   //     * @brief Writes up to #dataSize bytes to the slave device.
-   //     * @param device The device.
-   //     * @param deviceAddress The slave device address.
-   //     * @param memoryAddress The memory address within the slave device to write to.
-   //     * @param[out] data The buffer to write the data from.
-   //     * @param length The length of the data to be written.
-   //     * @returns A status code (STATUS_OK on success, STATUS_ERROR on error)
-   //     * or the number of bytes actually written.
-   //     */
-   //    StatusOrNumber (*memoryWrite)(const MicrokitI2cDevice device, const UInt8 deviceAddress,
-   //                                  const UInt16 memoryAddress, const UInt16 memoryAddressSize,
-   //                                  const UInt8* data, const Size dataSize, const Bool async);
+   /**
+    * @brief Writes up to #dataSize bytes to the target device.
+    * @param device The device.
+    * @param deviceAddress The target address.
+    * @param memoryAddress The memory address within the target device to write to.
+    * @param[out] data The buffer to write the data from.
+    * @param length The length of the data to be written.
+    * @returns A status code (STATUS_OK on success, STATUS_ERROR on error)
+    * or the number of bytes actually written.
+    */
+   StatusOrNumber (*memoryWrite)(const MicrokitI3cDevice device, const UInt8 deviceAddress,
+                                 const UInt16 memoryAddress, const UInt16 memoryAddressSize,
+                                 const UInt8* data, const Size dataSize, const Bool async);
 
 } MicrokitDriverI3cInterface;
 

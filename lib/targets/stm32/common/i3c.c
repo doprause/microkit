@@ -8,6 +8,8 @@
 
 #include "stm32h5xx_hal.h"
 
+#include <string.h>
+
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    👉 Constants
    - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -76,7 +78,9 @@ struct I3cDeviceObject {
    //    I2cMode mode;
    // I3cStatus status;
    //    I2cSlaveState slave;
-   UInt8 targetReceiveBuffer[1];
+   bool controllerMemoryWriteComplete;
+   UInt8 receiveBuffer[1];
+   UInt8 transmitBuffer[1];
    bool targetAddressAssignmentComplete;
    bool targetReceiveComplete;
    bool targetTransmitComplete;
@@ -92,6 +96,7 @@ struct I3cDeviceObject DEVICE_I3C1_INSTANCE = {
     .busState = MKIT_I3C_BUS_STATE_RESET,
     .state = MKIT_DRIVER_STATE_UNINITIALIZED,
     .targetCount = 0,
+    .controllerMemoryWriteComplete = true,
     .targetDescriptorsCount = 0,
     .targetAddressAssignmentComplete = false,
     .targetReceiveComplete = false,
@@ -106,6 +111,7 @@ struct I3cDeviceObject DEVICE_I3C2_INSTANCE = {
     .busState = MKIT_I3C_BUS_STATE_RESET,
     .state = MKIT_DRIVER_STATE_UNINITIALIZED,
     .targetCount = 0,
+    .controllerMemoryWriteComplete = true,
     .targetDescriptorsCount = 0,
     .targetAddressAssignmentComplete = false,
     .targetReceiveComplete = false,
@@ -120,6 +126,7 @@ struct I3cDeviceObject DEVICE_I3C3_INSTANCE = {
     .busState = MKIT_I3C_BUS_STATE_RESET,
     .state = MKIT_DRIVER_STATE_UNINITIALIZED,
     .targetCount = 0,
+    .controllerMemoryWriteComplete = true,
     .targetDescriptorsCount = 0,
     .targetAddressAssignmentComplete = false,
     .targetReceiveComplete = false,
@@ -174,8 +181,8 @@ void private_target_activate_notifications(MicrokitI3cDevice device) {
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 void private_target_start_listening(MicrokitI3cDevice device) {
 
-   device->mcuContextBuffers.RxBuf.pBuffer = device->targetReceiveBuffer;
-   device->mcuContextBuffers.RxBuf.Size = ARRAY_SIZE(device->targetReceiveBuffer);
+   device->mcuContextBuffers.RxBuf.pBuffer = device->receiveBuffer;
+   device->mcuContextBuffers.RxBuf.Size = ARRAY_SIZE(device->receiveBuffer);
 
    bool ok = HAL_I3C_Tgt_Receive_IT(&device->mcu, &device->mcuContextBuffers) == HAL_OK;
    ASSERT(ok);
@@ -301,6 +308,7 @@ void microkit_i3c_start(const MicrokitI3cDevice device, I3cConfig config) {
    private_target_activate_notifications(device);
 #endif
 
+   device->controllerMemoryWriteComplete = true;
    device->state = MKIT_DRIVER_STATE_RUNNING;
 }
 
@@ -349,7 +357,7 @@ void microkit_i3c_process(const MicrokitI3cDevice device) {
    if (device->targetReceiveComplete) {
       device->targetReceiveComplete = false;
 
-      Microkit.logger.log(MKIT_LOG_LEVEL_TRACE, "[I3C] Received: 0x%02X", device->targetReceiveBuffer[0]);
+      Microkit.logger.log(MKIT_LOG_LEVEL_TRACE, "[I3C] Received: 0x%02X", device->receiveBuffer[0]);
 
       private_target_start_listening(device);
    }
@@ -490,42 +498,91 @@ bool microkit_i3c_is_i3c_target_ready(const MicrokitI3cDevice device, const UInt
 
 //    return status == HAL_OK ? (int)dataSize : STATUS_ERROR;
 // }
+#define MICROKIT_I3C_ADDRESSBUFFER_SIZE 4
+#define MICROKIT_I3C_DATABUFFER_SIZE 16
 
-// /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-// StatusOrNumber microkit_i2c_memory_write(
-//     const MicrokitI2cDevice device, const UInt8 deviceAddress,
-//     const UInt16 memoryAddress, const UInt16 memoryAddressSize,
-//     const UInt8* data, const Size dataSize, const Bool async) {
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+StatusOrNumber microkit_i3c_memory_write(
+    const MicrokitI3cDevice device, const UInt8 deviceAddress,
+    const UInt16 memoryAddress, const UInt16 memoryAddressSize,
+    const UInt8* data, const Size dataSize, const Bool async) {
 
-//    ASSERT_NOT_NULL_POINTER(device);
-//    ASSERT(device->state == MKIT_DRIVER_STATE_RUNNING);
+   ASSERT_NOT_NULL_POINTER(device);
+   ASSERT(device->state == MKIT_DRIVER_STATE_RUNNING);
 
-//    if (device->status.memoryWriteComplete == false) {
-//       return STATUS_ERROR;
-//    }
+   if (device->controllerMemoryWriteComplete == false) {
+      return STATUS_ERROR;
+   }
 
-//    HAL_Delay(10); // Without this delay, the transfer is not reliable
+   HAL_Delay(10); // Without this delay, the transfer is not reliable
 
-//    device->status.memoryWriteComplete = false;
+   device->controllerMemoryWriteComplete = false;
 
-//    HAL_StatusTypeDef status =
-//        HAL_I2C_Mem_Write_IT(
-//            &device->mcu,
-//            (UInt16)deviceAddress << 1,
-//            memoryAddress,
-//            memoryAddressSize,
-//            (UInt8*)data,
-//            dataSize);
+   HAL_StatusTypeDef status;
 
-//    // If we are not in async mode, we need to wait for the transfer to complete
-//    if (!async) {
-//       while (!device->status.memoryWriteComplete) {
-//          // Wait for the transfer to complete
-//       };
-//    }
+   // 1. Create a transfer descriptor for the memory address
+   UInt8 addressBuffer[MICROKIT_I3C_ADDRESSBUFFER_SIZE];
+   Size addressBufferSize = min(MICROKIT_I3C_ADDRESSBUFFER_SIZE, memoryAddressSize);
 
-//    return status == HAL_OK ? (int)dataSize : STATUS_ERROR;
-// }
+   memcpy(addressBuffer, &memoryAddress, memoryAddressSize); // Copy either 1 or 2 bytes
+
+   I3C_PrivateTypeDef addressTransfer = {
+       .Direction = HAL_I3C_DIRECTION_WRITE,
+       .TargetAddr = deviceAddress,
+       .TxBuf = {addressBuffer, addressBufferSize},
+       .RxBuf = {NULL, 0},
+   };
+
+   // 2. Create a transfer descriptor for the data
+   UInt8 dataBuffer[MICROKIT_I3C_DATABUFFER_SIZE];
+   Size dataBufferSize = min(MICROKIT_I3C_DATABUFFER_SIZE, dataSize);
+
+   memcpy(dataBuffer, data, dataBufferSize); // Copy either 1 or 2 bytes
+
+   I3C_PrivateTypeDef dataTransfer = {
+       .Direction = HAL_I3C_DIRECTION_WRITE,
+       .TargetAddr = deviceAddress,
+       .TxBuf = {dataBuffer, dataBufferSize},
+       .RxBuf = {NULL, 0},
+   };
+
+   // 3. Create a transfer descriptor for the whole transfer
+   I3C_PrivateTypeDef transferDescriptor[2] =
+       {
+           addressTransfer,
+           dataTransfer,
+       };
+
+   // Create the whole transfer descriptor
+   UInt32 controlBuffer[2];
+   UInt8 txBuffer[addressBufferSize + dataBufferSize];
+
+   I3C_XferTypeDef transfer = {
+       .CtrlBuf = {controlBuffer, 2},
+       .StatusBuf = {NULL, 0},
+       .TxBuf = {txBuffer, addressBufferSize + dataBufferSize}};
+
+   status = HAL_I3C_AddDescToFrame(
+       &device->mcu,
+       NULL,
+       transferDescriptor,
+       &transfer,
+       transfer.CtrlBuf.Size,
+       I3C_PRIVATE_WITH_ARB_RESTART);
+
+   // Transmit the data
+   status = HAL_I3C_Ctrl_Transmit_IT(&device->mcu, &transfer);
+   return status;
+
+   // If we are not in async mode, we need to wait for the transfer to complete
+   if (!async) {
+      while (!device->controllerMemoryWriteComplete) {
+         // Wait for the transfer to complete
+      };
+   }
+
+   return status == HAL_OK ? (int)dataSize : STATUS_ERROR;
+}
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    👉 Vendor specific code
@@ -559,15 +616,11 @@ void HAL_I3C_CtrlDAACpltCallback(I3C_HandleTypeDef* handle) {
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-void HAL_I3C_NotifyCallback(I3C_HandleTypeDef* handle, UInt32 eventId) {
+void HAL_I3C_CtrlTxCpltCallback(I3C_HandleTypeDef* handle) {
 
-	MicrokitI3cDevice device = private_get_device_from_handle(handle);
+   MicrokitI3cDevice device = private_get_device_from_handle(handle);
 
-   if ((eventId & EVENT_ID_DAU) == EVENT_ID_DAU) {
-      device->busState = MKIT_I3C_BUS_STATE_READY;
-
-      device->targetAddressAssignmentComplete = true;
-   }
+   device->controllerMemoryWriteComplete = true;
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -588,6 +641,24 @@ void HAL_I3C_TgtTxCpltCallback(I3C_HandleTypeDef* handle) {
    MicrokitI3cDevice device = private_get_device_from_handle(handle);
 
    device->targetTransmitComplete = true;
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+void HAL_I3C_NotifyCallback(I3C_HandleTypeDef* handle, UInt32 eventId) {
+
+   MicrokitI3cDevice device = private_get_device_from_handle(handle);
+
+   if ((eventId & EVENT_ID_DAU) == EVENT_ID_DAU) {
+      device->busState = MKIT_I3C_BUS_STATE_READY;
+
+      device->targetAddressAssignmentComplete = true;
+   }
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+void HAL_I3C_ErrorCallback(I3C_HandleTypeDef* handle) {
+
+   MicrokitI3cDevice device = private_get_device_from_handle(handle);
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */

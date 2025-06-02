@@ -69,6 +69,7 @@ MicrokitInterface Microkit = {
             .stop = microkit_i3c_stop,
             .process = microkit_i3c_process,
             .transmit = microkit_i3c_transmit,
+            .memoryWrite = microkit_i3c_memory_write,
         },
 #endif
 

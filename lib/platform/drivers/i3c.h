@@ -25,10 +25,10 @@ StatusOrNumber microkit_i3c_transmit(
 //     const UInt16 memoryAddress, const UInt16 memoryAddressSize,
 //     UInt8* data, const Size dataSize, const Bool async);
 
-// StatusOrNumber microkit_i2c_memory_write(
-//     const MicrokitI2cDevice device, const UInt8 deviceAddress,
-//     const UInt16 memoryAddress, const UInt16 memoryAddressSize,
-//     const UInt8* data, const Size dataSize, const Bool async);
+StatusOrNumber microkit_i3c_memory_write(
+    const MicrokitI3cDevice device, const UInt8 deviceAddress,
+    const UInt16 memoryAddress, const UInt16 memoryAddressSize,
+    const UInt8* data, const Size dataSize, const Bool async);
 
 #endif // MICROKIT_CONFIG_USE_I3C
 #endif // MICROKIT_DRIVER_I3C_H
