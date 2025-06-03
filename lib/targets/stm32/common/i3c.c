@@ -659,6 +659,10 @@ void HAL_I3C_NotifyCallback(I3C_HandleTypeDef* handle, UInt32 eventId) {
 void HAL_I3C_ErrorCallback(I3C_HandleTypeDef* handle) {
 
    MicrokitI3cDevice device = private_get_device_from_handle(handle);
+
+   // Rest flags
+   device->targetAddressAssignmentComplete = false;
+   device->controllerMemoryWriteComplete = true;
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
