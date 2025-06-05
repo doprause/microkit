@@ -9,6 +9,7 @@
  */
 
 #include "libs/microkit/lib/core.h"
+#include "libs/microkit/lib/microkit.h"
 
 #if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_UART)
 
@@ -42,13 +43,24 @@ struct UartDeviceObject {
    👉 Configuration
    - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 #if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_UART_USE_UART1)
-struct UartDeviceObject DEVICE_UART1 = {.state = MKIT_UART_STATE_CREATED,
-                                        .mcu = {0}};
+struct UartDeviceObject DEVICE_UART1 = {
+    .state = MKIT_UART_STATE_CREATED,
+    .mcu = {0},
+};
 #endif
 
 #if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_UART_USE_UART2)
-struct UartDeviceObject DEVICE_UART2 = {.state = MKIT_UART_STATE_CREATED,
-                                        .mcu = {0}};
+struct UartDeviceObject DEVICE_UART2 = {
+    .state = MKIT_UART_STATE_CREATED,
+    .mcu = {0},
+};
+#endif
+
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_UART_USE_UART5)
+struct UartDeviceObject DEVICE_UART5 = {
+    .state = MKIT_UART_STATE_CREATED,
+    .mcu = {0},
+};
 #endif
 
 #if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_CONSOLE) && MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_CONSOLE_USE_UART1)
@@ -66,6 +78,15 @@ const MicrokitUartDevice DEVICE_CONSOLE = &DEVICE_UART2;
 #else
 #error \
     "To use USART2 for the console, configure MICROKIT_CONFIG_CONSOLE_USE_UART2 in config/mcu.h"
+#endif
+#endif
+
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_CONSOLE) && MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_CONSOLE_USE_UART5)
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_UART_USE_UART5)
+const MicrokitUartDevice DEVICE_CONSOLE = &DEVICE_UART5;
+#else
+#error \
+    "To use USART5 for the console, configure MICROKIT_CONFIG_CONSOLE_USE_UART5 in config/mcu.h"
 #endif
 #endif
 
@@ -176,6 +197,22 @@ void microkit_uart_init() {
    DEVICE_UART2.mcu.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
 
    DEVICE_UART2.state = MKIT_UART_STATE_STOPPED;
+#endif
+
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_UART_USE_UART5)
+   DEVICE_UART5.mcu.Instance = UART5;
+   DEVICE_UART5.mcu.Init.BaudRate = 115200;
+   DEVICE_UART5.mcu.Init.WordLength = UART_WORDLENGTH_8B;
+   DEVICE_UART5.mcu.Init.StopBits = UART_STOPBITS_1;
+   DEVICE_UART5.mcu.Init.Parity = UART_PARITY_NONE;
+   DEVICE_UART5.mcu.Init.Mode = UART_MODE_TX_RX;
+   DEVICE_UART5.mcu.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+   DEVICE_UART5.mcu.Init.OverSampling = UART_OVERSAMPLING_16;
+   DEVICE_UART5.mcu.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
+   DEVICE_UART5.mcu.Init.ClockPrescaler = UART_PRESCALER_DIV1;
+   DEVICE_UART5.mcu.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+
+   DEVICE_UART5.state = MKIT_UART_STATE_STOPPED;
 #endif
 }
 

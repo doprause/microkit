@@ -14,9 +14,6 @@
 extern ShellCommand COMMANDS[];
 extern Size COMMAND_COUNT;
 
-extern ShellLogger LOGGERS[];
-extern Size LOGGER_COUNT;
-
 static const int STATUS_ERROR_UNKNOWN_COMMAND = -1000;
 
 static const char* COMMAND_PROMPT = "$ ";                                               // colorize("host-emulator > ", TERMCOLOR_GREY)
@@ -50,10 +47,7 @@ struct MicrokitShellObject {
    MicrokitShellCommandHistory commandHistory;
    char receiveBuffer[MICROKIT_SHELL_MAX_COMMAND_SIZE];
    char* receiveBufferPointer;
-   // PowerSimulatorInstance powerSimulator;
    MicrokitUartDevice serial;
-   // SupervisorInstance supervisor;
-   // SoftwareTimerInstance softwareTimer;
    const char* prompt;
    char terminator;
 };
@@ -266,31 +260,19 @@ static void private_process_character(const ShellModule instance, Int32 characte
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-// static void onLoggerTimerElapsed(const SoftwareTimerInstance timer, void* target, uint32 time) {
-
-//    UNUSED_ARG(timer);
-//    UNUSED_ARG(time);
-
-//    ShellModule instance = (ShellModule)target;
-
-//    ASSERT_NOT_NULL_POINTER(instance);
-
-//    instance->loggerPending = true;
-// }
+void microkit_shell_init(void) {
+   // Nothing to do here
+}
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-void microkit_shell_init(
+void microkit_shell_start(
     const ShellModule instance,
-    //  const SoftwareTimerInstance softwareTimer,
     const MicrokitUartDevice serial,
     const char* prompt,
-    const char terminator
-    //  const SupervisorInstance supervisor,
-    //  const PowerSimulatorInstance powerSimulator
-) {
+    const char terminator) {
 
    ASSERT_NOT_NULL_POINTER(instance);
-   ASSERT(instance->moduleState == MKIT_MODULE_STATE_UNINITIALIZED);
+   ASSERT(instance->moduleState != MKIT_MODULE_STATE_RUNNING);
 
    instance->commands = COMMANDS;
    instance->commandCount = COMMAND_COUNT;
@@ -301,28 +283,10 @@ void microkit_shell_init(
    instance->arrowKeyPressed = false;
    instance->escapeSequence = false;
    instance->errorPrinted = false;
-   instance->loggers = LOGGERS;
-   instance->loggerActive = false;
-   instance->loggerCount = LOGGER_COUNT;
-   instance->loggerPending = false;
-   instance->loggerTimerId = 0;
    instance->receiveBufferPointer = instance->receiveBuffer;
    instance->serial = serial;
-   // instance->softwareTimer = softwareTimer;
-   // instance->supervisor = supervisor;
-   // instance->powerSimulator = powerSimulator;
-   // volatile int test = strcmp(prompt, "123");
    instance->prompt = strcmp(prompt, "") != 0 ? prompt : COMMAND_PROMPT,
    instance->terminator = terminator;
-
-   instance->moduleState = MKIT_MODULE_STATE_STOPPED;
-}
-
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-void microkit_shell_start(const ShellModule instance) {
-
-   ASSERT_NOT_NULL_POINTER(instance);
-   ASSERT(instance->moduleState != MKIT_MODULE_STATE_UNINITIALIZED);
 
    MicrokitUartConfig config = {
        .baudrate = MKIT_UART_BAUDRATE_115200,
@@ -332,13 +296,6 @@ void microkit_shell_start(const ShellModule instance) {
    };
 
    Microkit.driver.uart.start(instance->serial, config);
-
-   // instance->loggerTimerId = SoftwareTimer.start(
-   //     instance->softwareTimer,
-   //     onLoggerTimerElapsed,
-   //     instance,
-   //     1000,
-   //     TIMER_PERIODIC);
 
    instance->moduleState = MKIT_MODULE_STATE_RUNNING;
 
@@ -351,7 +308,6 @@ void microkit_shell_stop(const ShellModule instance) {
    ASSERT_NOT_NULL_POINTER(instance);
    ASSERT(instance->moduleState != MKIT_MODULE_STATE_UNINITIALIZED);
 
-   // SoftwareTimer.stop(instance->softwareTimer, instance->loggerTimerId);
    Microkit.driver.uart.stop(instance->serial);
 
    instance->moduleState = MKIT_MODULE_STATE_STOPPED;
@@ -387,22 +343,6 @@ void microkit_shell_process(const ShellModule instance) {
       instance->commandPending = false;
       instance->errorPrinted = false;
    }
-
-   // Process loggers
-   // for (Size i = 0; i < instance->loggerCount; i++) {
-   //    if (instance->loggers[i].status != NULL && instance->loggers[i].status(instance)) {
-   //       instance->loggerActive = true;
-
-   //       if (instance->loggerPending) {
-   //          instance->loggers[i].handler(instance);
-   //       }
-   //    }
-   // }
-
-   // Reset the loggers pending flag
-   // if (instance->loggerPending) {
-   //    instance->loggerPending = false;
-   // }
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -419,8 +359,6 @@ void microkit_shell_write(const ShellModule instance, const char* format, ...) {
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 void microkit_shell_write_error(const ShellModule instance, const char* format, ...) {
-   // microkit_shell_write_new_line(instance, format);
-   // microkit_shell_write_new_line(instance, colorize(format, TERMCOLOR_RED));
 
    ASSERT_NOT_NULL_POINTER(instance);
    ASSERT(instance->moduleState == MKIT_MODULE_STATE_RUNNING);
@@ -440,8 +378,6 @@ void microkit_shell_write_error(const ShellModule instance, const char* format, 
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 void microkit_shell_write_line(const ShellModule instance, const char* format, ...) {
-   // microkit_shell_write(instance, format);
-   // microkit_shell_write(instance, "\n");
 
    ASSERT_NOT_NULL_POINTER(instance);
    ASSERT(instance->moduleState == MKIT_MODULE_STATE_RUNNING);
@@ -455,8 +391,6 @@ void microkit_shell_write_line(const ShellModule instance, const char* format, .
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 void microkit_shell_write_new_line(const ShellModule instance, const char* format, ...) {
-   // microkit_shell_write(instance, "\n");
-   // microkit_shell_write_line(instance, format);
 
    ASSERT_NOT_NULL_POINTER(instance);
    ASSERT(instance->moduleState == MKIT_MODULE_STATE_RUNNING);
@@ -468,21 +402,5 @@ void microkit_shell_write_new_line(const ShellModule instance, const char* forma
    private_print(instance, "\n");
    va_end(args);
 }
-
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-// PowerSimulatorInstance powerSimulator(const ShellModule instance) {
-
-//    ASSERT_NOT_NULL_POINTER(instance);
-
-//    return instance->powerSimulator;
-// }
-
-// /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-// SupervisorInstance supervisor(const ShellModule instance) {
-
-//    ASSERT_NOT_NULL_POINTER(instance);
-
-//    return instance->supervisor;
-// }
 
 #endif // MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_SHELL)

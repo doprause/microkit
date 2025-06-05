@@ -1,5 +1,4 @@
-#ifndef MICROKIT_SHELL_H
-#define MICROKIT_SHELL_H
+#pragma once
 
 #include "libs/microkit/lib/core.h"
 #include "libs/microkit/lib/uart.h"
@@ -89,33 +88,20 @@ typedef struct {
 typedef struct {
    /**
     * @brief Initializes the given shell module instance.
-    * @param softwareTimer The software timer to be used.
-    * @param serial The serial communication interface to be used with the shell.
-    * @param terminator The command terminator string.
     */
-   void (*init)(
-       const ShellModule shell,
-       const MicrokitUartDevice serial,
-       const char* prompt,
-       const char terminator);
-   // ShellModule (*init)(
-   //     const SoftwareTimerInstance softwareTimer,
-   //     const SerialInstance serial,
-   //     const char terminator,
-   //     const SupervisorInstance supervisor,
-   //     const PowerSimulatorInstance powerSimulator);
-
-   // /**
-   //  * @brief Destroys the instance and frees the memory.
-   //  * @param instance The instance to destroy.
-   //  */
-   // void (*destroy)(const ShellModule shell);
+   void (*init)(void);
 
    /**
     * @brief Starts the shell.
     * @param instance The instance.
+    * @param serial The serial communication interface to be used with the shell.
+    * @param prompt The command prompt string.
+    * @param terminator The command terminator string.
     */
-   void (*start)(const ShellModule shell);
+   void (*start)(const ShellModule shell,
+                 const MicrokitUartDevice serial,
+                 const char* prompt,
+                 const char terminator);
 
    /**
     * @brief Stops the shell.
@@ -163,23 +149,6 @@ typedef struct {
     */
    void (*writeNewLine)(const ShellModule shell, const char* message, ...);
 
-   // /**
-   //  * @brief Gets the power simulator instance.
-   //  * Typically used to get the power simulator instance within a command handler.
-   //  * @param instance The instance.
-   //  * @returns The power simulator instance.
-   //  */
-   // PowerSimulatorInstance (*powerSimulator)(const ShellModule shell);
-
-   // /**
-   //  * @brief Gets the supervisor instance.
-   //  * Typically used to get the supervisor instance within a command handler.
-   //  * @param instance The instance.
-   //  * @returns The supervisor instance.
-   //  */
-   // SupervisorInstance (*supervisor)(const ShellModule shell);
-
 } MicrokitShellInterface;
 
-#endif // MICROKIT_CONFIG_USE_SHELL
-#endif // MICROKIT_SHELL_H
+#endif // MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_SHELL)

@@ -15,13 +15,13 @@
 #include "libs/microkit/lib/uart.h"
 #include "microkit/config/shell.h"
 
-void microkit_shell_init(
-    const ShellModule instance,
-    const MicrokitUartDevice serial,
-    const char* prompt,
-    const char terminator);
+void microkit_shell_init(void);
+
+void microkit_shell_start(const ShellModule instance,
+                          const MicrokitUartDevice serial,
+                          const char* prompt,
+                          const char terminator);
 void microkit_shell_stop(const ShellModule instance);
-void microkit_shell_start(const ShellModule instance);
 void microkit_shell_process(const ShellModule instance);
 void microkit_shell_write(const ShellModule instance, const char* format, ...);
 void microkit_shell_write_error(const ShellModule instance, const char* format, ...);

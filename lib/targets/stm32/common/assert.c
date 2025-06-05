@@ -9,6 +9,7 @@
  */
 
 #include "libs/microkit/lib/core.h"
+#include "microkit/config/microkit.h"
 
 #if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_ASSERT)
 
@@ -19,9 +20,6 @@
 #include <stm32h5xx_hal.h>
 
 void gpio_assertion(void) {
-
-   // Enables LD2 on the Nucleo board
-   HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
 
    while (1) {
    }

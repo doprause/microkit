@@ -12,6 +12,7 @@
 #include "libs/microkit/lib/timeout.h"
 #include "libs/microkit/lib/types.h"
 #include "libs/microkit/lib/uart.h"
+#include "libs/microkit/lib/utils/termcolor.h"
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    👉 Types
