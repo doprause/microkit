@@ -7,13 +7,11 @@
  * @copyright Copyright (c) 2025
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-#include "libs/microkit/lib/platform/systick.h"
-
 #include "libs/microkit/lib/assert.h"
 #include "libs/microkit/lib/debug.h"
+#include "libs/microkit/lib/platform/systick.h"
 
 #include <stdlib.h>
-#include <stm32h533xx.h>
 #include <stm32h5xx_hal.h>
 
 #define MAX_SYSTICK_HANDLERS 4

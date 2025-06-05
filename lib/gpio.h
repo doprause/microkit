@@ -1,20 +1,20 @@
 /**
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- * @file uart.h
+ * @file gpio.h
  * @author Dominik Prause
  * @version 0.1
- * @date 2025-04-17
+ * @date 2025-06-04
  * @copyright Copyright (c) 2025 - All rights reserved.
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
-#ifndef MICROKIT_UART_H
-#define MICROKIT_UART_H
-
-#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_UART)
+#ifndef MICROKIT_GPIO_H
+#define MICROKIT_GPIO_H
 
 #include "libs/microkit/lib/core.h"
 #include "libs/microkit/lib/types.h"
-#include "microkit/config/uart.h"
+#include "microkit/config/gpio.h"
+
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_GPIO)
 
 /**
  * @brief UART baudrate settings.
@@ -114,4 +114,4 @@ typedef struct {
 } MicrokitDriverUartInterface;
 
 #endif // MICROKIT_CONFIG_USE_UART
-#endif // MICROKIT_UART_H
+#endif // MICROKIT_GPIO_H

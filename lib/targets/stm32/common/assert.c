@@ -7,9 +7,15 @@
  * @copyright Copyright (c) 2025 - All rights reserved.
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
-#include "libs/microkit/lib/platform/assert.h"
 
-#include <stm32h533xx.h>
+#include "libs/microkit/lib/core.h"
+
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_ASSERT)
+
+#include "libs/microkit/lib/platform/assert.h"
+#include "libs/microkit/lib/targets/stm32/target.h"
+
+#include <stm32h523xx.h>
 #include <stm32h5xx_hal.h>
 
 void gpio_assertion(void) {
@@ -20,3 +26,5 @@ void gpio_assertion(void) {
    while (1) {
    }
 }
+
+#endif // MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_ASSERT)

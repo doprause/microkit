@@ -1,5 +1,17 @@
-#include "libs/microkit/lib/assert.h"
+/**
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ * @file i3c.c
+ * @author Dominik Prause
+ * @version 0.1
+ * @date 2025-05-15
+ * @copyright Copyright (c) 2025 - All rights reserved.
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
 #include "libs/microkit/lib/core.h"
+
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_I3C)
+
+#include "libs/microkit/lib/assert.h"
 #include "libs/microkit/lib/debug.h"
 #include "libs/microkit/lib/microkit.h"
 #include "libs/microkit/lib/platform/drivers/i3c.h"
@@ -702,3 +714,7 @@ void I3C3_ER_IRQHandler(void) {
    HAL_I3C_ER_IRQHandler(&DEVICE_I3C3->mcu);
 }
 #endif
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+#endif // MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_I3C)

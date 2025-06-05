@@ -7,8 +7,12 @@
  * @copyright Copyright (c) 2025 - All rights reserved.
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
-#include "libs/microkit/lib/assert.h"
+
 #include "libs/microkit/lib/core.h"
+
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_UART)
+
+#include "libs/microkit/lib/assert.h"
 #include "libs/microkit/lib/platform/drivers/uart.h"
 #include "libs/microkit/lib/platform/stdio.h"
 #include "libs/microkit/lib/uart.h"
@@ -255,3 +259,7 @@ void mkit_platform_stdio_put(int c) {
 
    HAL_UART_Transmit(&DEVICE_CONSOLE->mcu, (unsigned char*)&c, 1, 100);
 }
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+#endif // MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_UART)

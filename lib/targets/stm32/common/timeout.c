@@ -7,8 +7,11 @@
  * @copyright Copyright (c) 2025
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-#include "libs/microkit/lib/assert.h"
 #include "libs/microkit/lib/core.h"
+
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_TIMEOUT)
+
+#include "libs/microkit/lib/assert.h"
 #include "libs/microkit/lib/platform/systick.h"
 #include "libs/microkit/lib/platform/timeout.h"
 #include "microkit/config/microkit.h"
@@ -98,3 +101,6 @@ void microkit_timeout_set(UInt16 timeout, void* target, MicrokitTimeoutHandler h
 
    ASSERT_NOT_REACHED;
 }
+
+
+#endif // MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_TIMEOUT)

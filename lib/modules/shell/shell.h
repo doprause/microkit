@@ -7,15 +7,13 @@
  * @copyright Copyright (c) 2025 - All rights reserved.
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
-#ifndef MICROKIT_MODULE_SHELL_H
-#define MICROKIT_MODULE_SHELL_H
+#pragma once
 
-#include "libs/microkit/lib/core.h"
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_SHELL)
+
 #include "libs/microkit/lib/shell.h"
 #include "libs/microkit/lib/uart.h"
 #include "microkit/config/shell.h"
-
-#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_SHELL)
 
 void microkit_shell_init(
     const ShellModule instance,
@@ -30,5 +28,4 @@ void microkit_shell_write_error(const ShellModule instance, const char* format, 
 void microkit_shell_write_line(const ShellModule instance, const char* format, ...);
 void microkit_shell_write_new_line(const ShellModule instance, const char* format, ...);
 
-#endif // MICROKIT_CONFIG_USE_SHELL
-#endif // MICROKIT_MODULE_SHELL_H
+#endif // MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_SHELL)

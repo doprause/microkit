@@ -10,11 +10,11 @@
 #ifndef MICROKIT_I2C_H
 #define MICROKIT_I2C_H
 
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_I2C)
+
 #include "libs/microkit/lib/core.h"
 #include "libs/microkit/lib/types.h"
 #include "microkit/config/i2c.h"
-
-#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_I2C)
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    👉 I2C type definitions

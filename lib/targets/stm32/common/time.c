@@ -8,13 +8,14 @@
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 #include "libs/microkit/lib/core.h"
+
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_TIME)
+
 #include "libs/microkit/lib/platform/time.h"
 #include "microkit/config/microkit.h"
 #include "microkit/config/time.h"
 
 #include <stm32h5xx_hal.h>
-
-#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_TIME)
 
 #if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_TIME_DELAY_MICROS)
 void microkit_time_delay_micros(UInt32 micros) {
@@ -26,4 +27,4 @@ void microkit_time_delay_millis(UInt32 millis) {
    HAL_Delay(millis);
 }
 
-#endif
+#endif // MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_TIME)

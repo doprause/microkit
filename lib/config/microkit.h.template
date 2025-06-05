@@ -1,20 +1,30 @@
 /**
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- * Uncomment the following lines to enable the features you need.
- * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- *
- * These settings specify the overall configuration of the Microkit library.
- *
+ * This is the top level configuration for the microkit library
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
-#define MICROKIT_CONFIG_USE_ASSERT 1
-#define MICROKIT_CONFIG_USE_CONSOLE 1
-#define MICROKIT_CONFIG_USE_DEBUG_CONSOLE 1
-#define MICROKIT_CONFIG_USE_DEBUG_LED 1
-#define MICROKIT_CONFIG_USE_I2C 1
-#define MICROKIT_CONFIG_USE_I3C 1
-#define MICROKIT_CONFIG_USE_LOGGER 1
-#define MICROKIT_CONFIG_USE_SHELL 1
-#define MICROKIT_CONFIG_USE_TIME 1
-#define MICROKIT_CONFIG_USE_TIMEOUT 1
-#define MICROKIT_CONFIG_USE_UART 1
+#pragma once
+
+#define MICROKIT_TARGET_ID_STM32H523RE "STM32H523RE"
+#define MICROKIT_TARGET_ID_STM32H533RE "STM32H533RE"
+
+/**- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ * 👉 Make your target settings here
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+#define MICROKIT_TARGET_ID MICROKIT_TARGET_ID_STM32H533RE
+
+/**- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ * 👉 Uncomment the lines to enable the features you need
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+// #define MICROKIT_CONFIG_USE_ASSERT 1
+// #define MICROKIT_CONFIG_USE_CONSOLE 1
+// #define MICROKIT_CONFIG_USE_DEBUG_CONSOLE 1
+// #define MICROKIT_CONFIG_USE_DEBUG_LED 1
+#define MICROKIT_CONFIG_USE_GPIO 1
+// #define MICROKIT_CONFIG_USE_I2C 1
+// #define MICROKIT_CONFIG_USE_I3C 1
+// #define MICROKIT_CONFIG_USE_LOGGER 1
+// #define MICROKIT_CONFIG_USE_SHELL 1
+// #define MICROKIT_CONFIG_USE_TIME 1
+// #define MICROKIT_CONFIG_USE_TIMEOUT 1
+// #define MICROKIT_CONFIG_USE_UART 1

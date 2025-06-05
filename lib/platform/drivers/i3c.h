@@ -1,11 +1,11 @@
 #ifndef MICROKIT_DRIVER_I3C_H
 #define MICROKIT_DRIVER_I3C_H
 
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_I3C)
+
 #include "libs/microkit/lib/core.h"
 #include "libs/microkit/lib/i3c.h"
 #include "microkit/config/i3c.h"
-
-#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_I3C)
 
 void microkit_i3c_init(void);
 void microkit_i3c_start(const MicrokitI3cDevice device, I3cConfig config);
@@ -30,5 +30,5 @@ StatusOrNumber microkit_i3c_memory_write(
     const UInt16 memoryAddress, const UInt16 memoryAddressSize,
     const UInt8* data, const Size dataSize, const Bool async);
 
-#endif // MICROKIT_CONFIG_USE_I3C
+#endif // MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_I3C)
 #endif // MICROKIT_DRIVER_I3C_H

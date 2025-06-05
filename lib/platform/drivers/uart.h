@@ -10,11 +10,11 @@
 #ifndef MICROKIT_DRIVER_UART_H
 #define MICROKIT_DRIVER_UART_H
 
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_UART)
+
 #include "libs/microkit/lib/core.h"
 #include "libs/microkit/lib/uart.h"
 #include "microkit/config/uart.h"
-
-#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_UART)
 
 void microkit_uart_init(void);
 void microkit_uart_start(const MicrokitUartDevice device, MicrokitUartConfig config);

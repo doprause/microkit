@@ -1,5 +1,4 @@
-#ifndef MICROKIT_H
-#define MICROKIT_H
+#pragma once
 
 #include "libs/microkit/lib/assert.h"
 #include "libs/microkit/lib/console.h"
@@ -13,6 +12,11 @@
 #include "libs/microkit/lib/timeout.h"
 #include "libs/microkit/lib/types.h"
 #include "libs/microkit/lib/uart.h"
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+   👉 Types
+   - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+typedef void (*InitCallback)(void);
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    👉 Driver API
@@ -37,7 +41,7 @@ typedef struct {
    👉 Microkit API
    - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 typedef struct {
-   void (*init)(void);
+   void (*init)(InitCallback before, InitCallback after);
    void (*start)(void);
    void (*stop)(void);
 
@@ -66,5 +70,3 @@ typedef struct {
 } MicrokitInterface;
 
 extern MicrokitInterface Microkit;
-
-#endif

@@ -4,7 +4,7 @@
 #include "microkit/config/microkit.h"
 #include "libs/microkit/lib/microkit.h"
 
-#include <stm32h533xx.h>
+//#include <stm32h533xx.h>
 #include <stm32h5xx_hal.h>
 
 #include <stdarg.h>

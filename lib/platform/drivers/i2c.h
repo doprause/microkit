@@ -1,11 +1,20 @@
+/**
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ * @file i2c.h
+ * @author Dominik Prause
+ * @version 0.1
+ * @date 2025-06-04
+ * @copyright Copyright (c) 2025 - All rights reserved.
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
 #ifndef MICROKIT_DRIVER_I2C_H
 #define MICROKIT_DRIVER_I2C_H
+
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_I2C)
 
 #include "libs/microkit/lib/core.h"
 #include "libs/microkit/lib/i2c.h"
 #include "microkit/config/i2c.h"
-
-#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_I2C)
 
 void microkit_i2c_init(void);
 void microkit_i2c_start(const MicrokitI2cDevice device, I2cConfig config);

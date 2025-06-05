@@ -1,0 +1,12 @@
+/**
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ * These settings specify the Debug features
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#pragma once
+#include "microkit.h"
+
+/**- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ * 👉 Change the following settings as needed
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+#define MICROKIT_CONFIG_DEBUG_PRINT_BUFFER_SIZE 128

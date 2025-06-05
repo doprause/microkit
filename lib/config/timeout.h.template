@@ -1,0 +1,12 @@
+/**
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ * These settings specify the TIMEOUT module features
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#pragma once
+#include "microkit.h"
+
+/**- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ * 👉 Change the following settings as needed
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+#define MICROKIT_MAX_TIMOUTS 8

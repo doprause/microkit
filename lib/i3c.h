@@ -10,10 +10,10 @@
 #ifndef MICROKIT_I3C_H
 #define MICROKIT_I3C_H
 
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_I3C)
+
 #include "microkit/config/i3c.h"
 #include "microkit/config/microkit.h"
-
-#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_I3C)
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    👉 I3C type definitions

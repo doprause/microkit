@@ -6,11 +6,11 @@
 #ifndef MICROKIT_LOGGER_H
 #define MICROKIT_LOGGER_H
 
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_LOGGER)
+
 #include "libs/microkit/lib/core.h"
 #include "libs/microkit/lib/types.h"
 #include "microkit/config/logger.h"
-
-#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_LOGGER)
 
 /**
  * @brief Log levels.

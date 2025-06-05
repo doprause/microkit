@@ -1,0 +1,13 @@
+/**
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ * These settings specify the GPIO driver features
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#pragma once
+#include "microkit.h"
+
+/**- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ * 👉 Uncomment the lines to enable the features you need
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+// TBD
