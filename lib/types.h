@@ -54,6 +54,18 @@ typedef enum {
 
 } StatusCodes;
 
+typedef enum {
+   MKIT_DRIVER_STATE_UNINITIALIZED,
+   MKIT_DRIVER_STATE_STOPPED,
+   MKIT_DRIVER_STATE_RUNNING
+} DriverState;
+
+typedef enum {
+   MKIT_MODULE_STATE_UNINITIALIZED,
+   MKIT_MODULE_STATE_STOPPED,
+   MKIT_MODULE_STATE_RUNNING
+} ModuleState;
+
 #define FALSE 0
 #define TRUE 1
 

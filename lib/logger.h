@@ -2,9 +2,7 @@
  * @brief A logger.
  * Inspired by https://github.com/rxi/log.c and https://github.com/ErichStyger/McuLib/blob/master/src/McuLog.h
  */
-
-#ifndef MICROKIT_LOGGER_H
-#define MICROKIT_LOGGER_H
+#pragma once
 
 #if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_LOGGER)
 
@@ -68,5 +66,3 @@ typedef struct {
 } MicrokitLoggerInterface;
 
 #endif // MICROKIT_CONFIG_USE_LOGGER
-
-#endif // MICROKIT_LOGGER_H
