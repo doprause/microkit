@@ -7,6 +7,34 @@
 #include "microkit.h"
 
 /**- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ * GPIO declarations
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+typedef enum {
+   MICROKIT_GPIO_PORT_A,
+   MICROKIT_GPIO_PORT_B,
+   MICROKIT_GPIO_PORT_C
+} GpioPort;
+
+typedef enum {
+   MICROKIT_GPIO_PIN_0,
+   MICROKIT_GPIO_PIN_1,
+   MICROKIT_GPIO_PIN_2,
+   MICROKIT_GPIO_PIN_3,
+   MICROKIT_GPIO_PIN_4,
+   MICROKIT_GPIO_PIN_5,
+   MICROKIT_GPIO_PIN_6,
+   MICROKIT_GPIO_PIN_7,
+   MICROKIT_GPIO_PIN_8,
+   MICROKIT_GPIO_PIN_9,
+   MICROKIT_GPIO_PIN_10,
+   MICROKIT_GPIO_PIN_11,
+   MICROKIT_GPIO_PIN_12,
+   MICROKIT_GPIO_PIN_13,
+   MICROKIT_GPIO_PIN_14,
+   MICROKIT_GPIO_PIN_15
+} GpioPin;
+
+/**- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  * 👉 Uncomment the lines to enable the features you need
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 

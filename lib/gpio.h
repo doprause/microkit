@@ -7,8 +7,7 @@
  * @copyright Copyright (c) 2025 - All rights reserved.
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
-#ifndef MICROKIT_GPIO_H
-#define MICROKIT_GPIO_H
+#pragma once
 
 #include "libs/microkit/lib/core.h"
 #include "libs/microkit/lib/types.h"
