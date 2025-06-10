@@ -7,8 +7,7 @@
  * @copyright Copyright (c) 2025 - All rights reserved.
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
-#ifndef MICROKIT_I3C_H
-#define MICROKIT_I3C_H
+#pragma once
 
 #if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_I3C)
 
@@ -218,4 +217,3 @@ typedef struct {
 } MicrokitDriverI3cInterface;
 
 #endif // MICROKIT_CONFIG_USE_I2C
-#endif // MICROKIT_I3C_H
