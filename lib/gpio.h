@@ -16,101 +16,52 @@
 #if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_GPIO)
 
 /**
- * @brief UART baudrate settings.
+ * @brief GPIO device pointer.
  */
-typedef enum {
-   MKIT_UART_BAUDRATE_9600,
-   MKIT_UART_BAUDRATE_19200,
-   MKIT_UART_BAUDRATE_38400,
-   MKIT_UART_BAUDRATE_115200,
-   MKIT_UART_BAUDRATE_230400,
-   MKIT_UART_BAUDRATE_460800,
-   MKIT_UART_BAUDRATE_921600
-} MicrokitUartBaudRate;
+typedef struct GpioDeviceObject* MicrokitGpioDevice;
 
 /**
- * @brief UART data bits settings.
- */
-typedef enum {
-   MKIT_UART_DATABITS_8,
-} MicrokitUartDataBits;
-
-/**
- * @brief UART stop bits settings.
- */
-typedef enum {
-   MKIT_UART_STOPBITS_1,
-   MKIT_UART_STOPBITS_2,
-} MicrokitUartStopBits;
-
-/**
- * @brief UART parity settings.
- */
-typedef enum {
-   MKIT_UART_PARITY_NONE,
-   MKIT_UART_PARITY_EVEN,
-   MKIT_UART_PARITY_ODD
-} MicrokitUartParity;
-
-/**
- * @brief UART configuration.
- */
-typedef struct {
-   const char* format;
-   const MicrokitUartBaudRate baudrate;
-   const MicrokitUartDataBits databits;
-   const MicrokitUartStopBits stopbits;
-   const MicrokitUartParity parity;
-} MicrokitUartConfig;
-
-/**
- * @brief UART device pointer.
- */
-typedef struct UartDeviceObject* MicrokitUartDevice;
-
-/**
- * @brief The UART driver interface.
+ * @brief The GPIO driver API.
  */
 typedef struct {
    /**
-    * @brief Initializes the enabled UART devices.
-    * UART devices can be enabled in the MCU configuration file.
+    * @brief Initializes the enabled GPIO devices.
+    * @note GPIO devices can be enabled in the corresponding configuration file.
     */
    void (*init)(void);
 
    /**
-    * @brief Starts and initializes the given UART device with the given
-    * configuration.
+    * @brief Starts the given GPIO device.
     * @param device The device.
-    * @param config The config.
     */
-   void (*start)(const MicrokitUartDevice device, MicrokitUartConfig config);
+   void (*start)(const MicrokitGpioDevice device);
 
    /**
-    * @brief Stops and de-initializes the given UART device.
+    * @brief Stops the given GPIO device.
     * @param device The device.
     */
-   void (*stop)(const MicrokitUartDevice device);
+   void (*stop)(const MicrokitGpioDevice device);
 
    /**
-    * @brief Sends the given data over the UART device.
-    * @param device The device.
-    * @param data The data to be sent.
-    * @param length The length of the data to be sent.
-    * @return The number of bytes sent.
+    * @brief Gets the state of the GPIO pin.
+    * @param instance The instance.
+    * @returns TRUE, if the GPIO pin is HIGH, FALSE otherwise.
     */
-   Int (*send)(const MicrokitUartDevice device, UInt8* data, Size length);
+   bool (*get)(const MicrokitGpioDevice device);
 
    /**
-    * @brief Receives up to maxLength bytes from the UART device.
-    * @param device The device.
-    * @param data The received data.
-    * @param maxLength The maximum number of bytes to receive.
-    * @return The number of bytes actually received.
+    * @brief Sets the state of the GPIO pin.
+    * @param instance The instance.
+    * @param on The GPIO state to be set. FALSE means LOW, TRUE means HIGH.
     */
-   Int (*receive)(const MicrokitUartDevice device, UInt8* data, Size maxLength);
+   void (*set)(const MicrokitGpioDevice device, bool on);
 
-} MicrokitDriverUartInterface;
+   /**
+    * @brief Toggles the LED.
+    * @param instance The instance.
+    */
+   void (*toggle)(const MicrokitGpioDevice device);
 
-#endif // MICROKIT_CONFIG_USE_UART
-#endif // MICROKIT_GPIO_H
+} MicrokitDriverGpioApi;
+
+#endif // MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_GPIO)

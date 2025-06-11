@@ -4,6 +4,7 @@
 #include "libs/microkit/lib/console.h"
 #include "libs/microkit/lib/core.h"
 #include "libs/microkit/lib/debug.h"
+#include "libs/microkit/lib/gpio.h"
 #include "libs/microkit/lib/i2c.h"
 #include "libs/microkit/lib/i3c.h"
 #include "libs/microkit/lib/logger.h"
@@ -23,6 +24,10 @@ typedef void (*InitCallback)(void);
    👉 Driver API
    - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 typedef struct {
+
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_GPIO)
+	MicrokitDriverGpioApi gpio;
+#endif
 
 #if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_I2C)
    MicrokitDriverI2cInterface i2c;

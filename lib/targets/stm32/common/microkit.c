@@ -20,9 +20,9 @@
 
 #include "stm32h5xx_hal.h"
 
-extern void SystemClock_Config(void);
-extern void MX_GPIO_Init(void);
-extern void MX_ICACHE_Init(void);
+// extern void SystemClock_Config(void);
+// extern void MX_GPIO_Init(void);
+// extern void MX_ICACHE_Init(void);
 
 static void init(InitCallback before, InitCallback after) {
 
@@ -71,6 +71,17 @@ MicrokitInterface Microkit = {
     .stop = stop,
 
     .driver = {
+#if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_GPIO)
+        .gpio = {
+            .init = microkit_gpio_init,
+            .start = microkit_gpio_start,
+            .stop = microkit_gpio_stop,
+            .get = microkit_gpio_receive,
+            .set = microkit_gpio_send,
+            .toggle = microkit_gpio_toggle,
+        },
+#endif
+
 #if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_I2C)
         .i2c = {
             .init = microkit_i2c_init,
@@ -103,7 +114,8 @@ MicrokitInterface Microkit = {
             .send = microkit_uart_send,
         },
 #endif
-    },
+
+    }, // driver
 
 #if MICROKIT_IS_CONFIGURED(MICROKIT_CONFIG_USE_CONSOLE)
     .console = {
